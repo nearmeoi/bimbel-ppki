@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "title": "Try Out Akbar Nasional Batch 4",
+    "category": "Try Out Akbar",
+    "date": "2026-10-28",
+    "time": "08:00 - 10:00 WIB",
+    "duration": "100 Menit",
+    "quota": 2500,
+    "registeredCount": 2180,
+    "isRegistered": true,
+    "status": "upcoming"
+  },
+  {
+    "id": 2,
+    "title": "Simulasi CAT Khusus Kemenkumham & Kejagung",
+    "category": "Try Out Instansi",
+    "date": "2026-11-02",
+    "time": "13:00 - 15:00 WIB",
+    "duration": "100 Menit",
+    "quota": 1000,
+    "registeredCount": 840,
+    "isRegistered": false,
+    "status": "upcoming"
+  },
+  {
+    "id": 3,
+    "title": "Try Out Mini Maraton: 45 Menit Kilat",
+    "category": "Latihan Cepat",
+    "date": "2026-11-05",
+    "time": "19:30 - 20:30 WIB",
+    "duration": "45 Menit",
+    "quota": 500,
+    "registeredCount": 310,
+    "isRegistered": false,
+    "status": "upcoming"
+  },
+  {
+    "id": 4,
+    "title": "Try Out Akbar Nasional Batch 3 (Selesai)",
+    "category": "Try Out Akbar",
+    "date": "2026-10-15",
+    "time": "08:00 - 10:00 WIB",
+    "duration": "100 Menit",
+    "quota": 2000,
+    "registeredCount": 2000,
+    "isRegistered": true,
+    "status": "completed",
+    "userScore": 410
+  }
+]

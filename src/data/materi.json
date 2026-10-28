@@ -1,0 +1,78 @@
+[
+  {
+    "id": "twk-1",
+    "title": "Pancasila & UUD 1945",
+    "type": "TWK",
+    "progress": 100,
+    "status": "Selesai",
+    "estimatedTime": "45 Menit",
+    "summary": "Pemahaman komprehensif mengenai sejarah perumusan Pancasila, pembukaan UUD 1945, serta kedudukan hukum tertinggi konstitusi negara.",
+    "chapters": [
+      { "id": 1, "title": "Sejarah BPUPKI & PPKI", "type": "video", "duration": "14:20", "completed": true },
+      { "id": 2, "title": "Butir-Butir Pengamalan Pancasila", "type": "article", "duration": "8 min", "completed": true },
+      { "id": 3, "title": "Kuis Pemahaman Pancasila", "type": "quiz", "duration": "15 min", "score": 100, "completed": true }
+    ]
+  },
+  {
+    "id": "twk-2",
+    "title": "Nasionalisme dalam Bingkai NKRI",
+    "type": "TWK",
+    "progress": 45,
+    "status": "Sedang Berjalan",
+    "estimatedTime": "60 Menit",
+    "videoUrl": "https://images.unsplash.com/photo-1544928147-79a2dbc1f389?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "summary": "Nasionalisme adalah paham yang menciptakan dan mempertahankan kedaulatan sebuah negara dengan mewujudkan satu konsep identitas bersama untuk sekelompok manusia yang mempunyai tujuan atau cita-cita yang sama dalam mewujudkan kepentingan nasional.",
+    "keyPoints": [
+      "Pilar Kebangsaan: Pancasila, UUD 1945, NKRI, Bhinneka Tunggal Ika.",
+      "Penerapan nasionalisme dalam kehidupan bernegara dan pencegahan radikalisme.",
+      "Tantangan integritas nasional di era globalisasi dan revolusi digital."
+    ],
+    "chapters": [
+      { "id": 1, "title": "1. Konsep Dasar Nasionalisme", "type": "video", "duration": "12:40", "active": true, "completed": false },
+      { "id": 2, "title": "2. Sejarah Pergerakan Nasional", "type": "article", "duration": "5 min baca", "completed": false },
+      { "id": 3, "title": "3. Kuis Mini TWK Penalaran", "type": "quiz", "duration": "Nilai: 100", "completed": true }
+    ]
+  },
+  {
+    "id": "tiu-1",
+    "title": "Deret Angka & Huruf",
+    "type": "TIU",
+    "progress": 0,
+    "status": "Belum Mulai",
+    "estimatedTime": "50 Menit",
+    "summary": "Metode praktis mendeteksi pola lompatan bertingkat, deret fibonacci, dan pola selang-seling dalam hitungan detik.",
+    "chapters": [
+      { "id": 1, "title": "Pola Deret Aritmetika Dasar", "type": "video", "duration": "10:15", "completed": false },
+      { "id": 2, "title": "Deret Fibonacci & Campuran", "type": "video", "duration": "16:00", "completed": false },
+      { "id": 3, "title": "Latihan 20 Soal Deret Cepat", "type": "quiz", "duration": "10 min", "completed": false }
+    ]
+  },
+  {
+    "id": "tiu-2",
+    "title": "Silogisme & Logika Analitis",
+    "type": "TIU",
+    "progress": 0,
+    "status": "Belum Mulai",
+    "estimatedTime": "55 Menit",
+    "summary": "Kaidah penarikan kesimpulan modus ponens, tollens, silogisme disjungtif, dan analisis diagram venn.",
+    "chapters": [
+      { "id": 1, "title": "Kaidah Dasar Silogisme", "type": "video", "duration": "15:20", "completed": false },
+      { "id": 2, "title": "Jebakan Kata 'Semua' vs 'Sebagian'", "type": "article", "duration": "6 min baca", "completed": false },
+      { "id": 3, "title": "Simulasi Silogisme Analitis", "type": "quiz", "duration": "15 min", "completed": false }
+    ]
+  },
+  {
+    "id": "tkp-1",
+    "title": "Pelayanan Publik & Jejaring Kerja",
+    "type": "TKP",
+    "progress": 80,
+    "status": "Sedang Berjalan",
+    "estimatedTime": "40 Menit",
+    "summary": "Strategi memilih opsi jawaban bernilai 5 pada indikator orientasi pelayanan, integritas kerja, dan kolaborasi.",
+    "chapters": [
+      { "id": 1, "title": "Karakteristik Opsi Nilai 5", "type": "video", "duration": "11:30", "completed": true },
+      { "id": 2, "title": "Studi Kasus Pelayanan Publik", "type": "article", "duration": "8 min", "completed": true },
+      { "id": 3, "title": "Simulasi Mini Kasus TKP", "type": "quiz", "duration": "10 min", "completed": false }
+    ]
+  }
+]

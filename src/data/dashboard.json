@@ -1,0 +1,198 @@
+{
+  "user": {
+    "name": "Budi Santoso",
+    "email": "budi.santoso@gmail.com",
+    "role": "calon_asn",
+    "targetInstansi": "Kemenkumham RI",
+    "targetScore": 450,
+    "currentRank": 42,
+    "rankDelta": "▲ 3 minggu ini",
+    "isPro": false
+  },
+  "continueLesson": {
+    "subject": "TWK",
+    "title": "Pancasila, bab 2",
+    "subtext": "Sistem Ketatanegaraan & Butir Pengamalan",
+    "route": "/materi/twk-1"
+  },
+  "stats": [
+    {
+      "id": "soal",
+      "value": "240",
+      "label": "Soal Dikerjakan",
+      "unit": "soal"
+    },
+    {
+      "id": "skor",
+      "value": "410",
+      "label": "Rata-rata Skor",
+      "sublabel": "dari 550",
+      "unit": "/550"
+    },
+    {
+      "id": "streak",
+      "value": "5",
+      "label": "Streak Hari",
+      "hasFlame": true,
+      "unit": "hari berturut"
+    }
+  ],
+  "passingGrade": {
+    "label": "Passing grade, sesuai ketentuan BKN terbaru",
+    "totalMax": 550,
+    "subjects": [
+      {
+        "code": "TWK",
+        "name": "Wawasan Kebangsaan",
+        "threshold": 65,
+        "max": 150
+      },
+      {
+        "code": "TIU",
+        "name": "Intelegensia Umum",
+        "threshold": 80,
+        "max": 175
+      },
+      {
+        "code": "TKP",
+        "name": "Karakteristik Pribadi",
+        "threshold": 156,
+        "max": 225
+      }
+    ]
+  },
+  "targetHarian": {
+    "completed": 20,
+    "target": 30,
+    "streakDays": 5
+  },
+  "pengumuman": [
+    {
+      "id": 1,
+      "badge": "Jadwal Try Out Akbar",
+      "date": {
+        "month": "NOV",
+        "day": "30"
+      },
+      "title": "Try Out Nasional Batch 5",
+      "time": "08:00 - 10:00 WIB",
+      "description": "Simulasi serentak mirip sistem CAT BKN se-Indonesia dengan pembobotan nilai SKD 2024 terbaru."
+    },
+    {
+      "id": 2,
+      "badge": "Try Out Spesial Formasi",
+      "date": {
+        "month": "DES",
+        "day": "05"
+      },
+      "title": "Try Out Khusus Formasi Kemenkeu & Kemenkumham",
+      "time": "13:00 - 15:00 WIB",
+      "description": "Simulasi pendalaman soal TWK pilar negara dan tes logika penalaran analitis TIU tingkat lanjut."
+    },
+    {
+      "id": 3,
+      "badge": "Webinar Mentoring",
+      "date": {
+        "month": "DES",
+        "day": "09"
+      },
+      "title": "Bedah Soal Silogisme & Berhitung Cepat",
+      "time": "19:30 - 21:00 WIB",
+      "description": "Tips & trik 30 detik menyelesaikan soal TIU bersama alumni CPNS ranking 1 nasional."
+    }
+  ],
+  "subjects": [
+    {
+      "id": "twk",
+      "title": "Tes Wawasan Kebangsaan",
+      "code": "TWK",
+      "current": 1,
+      "total": 8,
+      "lastScore": "118/150",
+      "time": "1 jam yang lalu",
+      "route": "/materi/twk"
+    },
+    {
+      "id": "tiu",
+      "title": "Tes Intelegensia Umum",
+      "code": "TIU",
+      "current": 2,
+      "total": 10,
+      "lastScore": "135/175",
+      "time": "3 jam yang lalu",
+      "route": "/materi/tiu"
+    },
+    {
+      "id": "tkp",
+      "title": "Tes Karakteristik Pribadi",
+      "code": "TKP",
+      "current": 3,
+      "total": 12,
+      "lastScore": "180/225",
+      "time": "Kemarin",
+      "route": "/materi/tkp"
+    }
+  ],
+  "rangkingTop5": [
+    {
+      "rank": 1,
+      "name": "Aditya Pratama",
+      "medal": "gold",
+      "twk": 140,
+      "tiu": 155,
+      "tkp": 205,
+      "totalScore": 500
+    },
+    {
+      "rank": 2,
+      "name": "Nurul Hidayah",
+      "medal": "silver",
+      "twk": 135,
+      "tiu": 150,
+      "tkp": 200,
+      "totalScore": 485
+    },
+    {
+      "rank": 3,
+      "name": "Rian Kusuma",
+      "medal": "bronze",
+      "twk": 135,
+      "tiu": 145,
+      "tkp": 195,
+      "totalScore": 475
+    },
+    {
+      "rank": 4,
+      "name": "Siti Rahmawati",
+      "medal": null,
+      "twk": 130,
+      "tiu": 145,
+      "tkp": 190,
+      "totalScore": 465
+    },
+    {
+      "rank": 5,
+      "name": "Fajar Ramadhan",
+      "medal": null,
+      "twk": 125,
+      "tiu": 140,
+      "tkp": 190,
+      "totalScore": 455
+    }
+  ],
+  "currentUserRank": {
+    "rank": 42,
+    "name": "Budi Santoso",
+    "avatarSrc": null,
+    "twk": 110,
+    "tiu": 125,
+    "tkp": 175,
+    "totalScore": 410,
+    "deltaText": "▲ 3 minggu ini",
+    "isCurrentUser": true
+  },
+  "insight": {
+    "title": "Peningkatan pesat terlihat pada materi TKP Anda!",
+    "description": "Untuk hasil yang lebih maksimal di ujian asli nanti, tingkatkan porsi latihan soal TWK (terutama penalaran pilar negara) serta asah kecepatan hitung numerik pada TIU."
+  }
+}

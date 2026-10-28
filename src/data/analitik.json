@@ -1,0 +1,28 @@
+{
+  "summary": {
+    "averageScore": 410,
+    "targetScore": 450,
+    "totalExams": 8,
+    "highestScore": 435,
+    "passingRate": "87.5%"
+  },
+  "scoreHistory": [
+    { "batch": "TO 1", "TWK": 85, "TIU": 110, "TKP": 145, "Total": 340 },
+    { "batch": "TO 2", "TWK": 90, "TIU": 120, "TKP": 150, "Total": 360 },
+    { "batch": "TO 3", "TWK": 95, "TIU": 125, "TKP": 160, "Total": 380 },
+    { "batch": "TO 4", "TWK": 90, "TIU": 130, "TKP": 165, "Total": 385 },
+    { "batch": "TO 5", "TWK": 100, "TIU": 135, "TKP": 168, "Total": 403 },
+    { "batch": "TO 6", "TWK": 100, "TIU": 140, "TKP": 170, "Total": 410 }
+  ],
+  "subjectPerformance": [
+    { "subject": "TWK", "user": 100, "passingGrade": 65, "target": 120, "percentage": 83 },
+    { "subject": "TIU", "user": 140, "passingGrade": 80, "target": 150, "percentage": 93 },
+    { "subject": "TKP", "user": 170, "passingGrade": 166, "target": 180, "percentage": 94 }
+  ],
+  "weakTopics": [
+    { "subject": "TWK", "topic": "Penalaran Pilar Negara & Sejarah Konstitusi", "accuracy": "52%", "priority": "Tinggi" },
+    { "subject": "TIU", "topic": "Kecepatan Hitung Aritmetika Sosial & Pecahan", "accuracy": "65%", "priority": "Sedang" },
+    { "subject": "TWK", "topic": "Bahasa Indonesia (PUEBI & Kalimat Efektif)", "accuracy": "68%", "priority": "Sedang" },
+    { "subject": "TKP", "topic": "Teknologi Informasi & Komunikasi", "accuracy": "82%", "priority": "Rendah" }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "podium": [
+    {
+      "rank": 2,
+      "name": "Budi S.",
+      "medal": "silver",
+      "score": 480,
+      "height": "h-20"
+    },
+    {
+      "rank": 1,
+      "name": "Agus T.",
+      "medal": "gold",
+      "score": 495,
+      "height": "h-28"
+    },
+    {
+      "rank": 3,
+      "name": "Citra W.",
+      "medal": "bronze",
+      "score": 475,
+      "height": "h-16"
+    }
+  ],
+  "nasional": [
+    { "rank": 4, "name": "Dewi Anjani", "twk": 110, "tiu": 155, "tkp": 175, "total": 440 },
+    { "rank": 5, "name": "Fajar Nugraha", "twk": 105, "tiu": 150, "tkp": 175, "total": 430 },
+    { "rank": 6, "name": "Gilang Pratama", "twk": 100, "tiu": 150, "tkp": 170, "total": 420 },
+    { "rank": 7, "name": "Hana Safitri", "twk": 105, "tiu": 145, "tkp": 168, "total": 418 },
+    { "rank": 8, "name": "Irfan Hakim", "twk": 100, "tiu": 145, "tkp": 170, "total": 415 }
+  ],
+  "currentUser": {
+    "rank": 24,
+    "name": "Anda (User)",
+    "twk": 100,
+    "tiu": 140,
+    "tkp": 170,
+    "total": 410,
+    "isCurrentUser": true
+  }
+}

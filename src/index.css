@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    background-color: #2239E5;
+    color: #000000;
+    -webkit-font-smoothing: antialiased;
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Accessible high-contrast focus ring as required by tokens: 3px yellow with black outline */
+  :focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 2px #000000, 0 0 0 5px #F9FF33 !important;
+    transition: box-shadow 150ms ease-in-out;
+  }
+}
+
+/* Custom Scrollbars matching the design */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EEEEEE;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2239E5;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #192BB3;
+}
+
+/* Utilities for scrollbar hiding */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Nav notch indicator */
+.nav-triangle {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.2);
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+}
+
+/* Safe area inset support for mobile */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* Infinite Marquee Animation for Strip Statistik */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}

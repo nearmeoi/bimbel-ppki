@@ -1,0 +1,52 @@
+[
+  {
+    "id": "paket-pejuang",
+    "name": "Paket Pejuang SKD",
+    "price": "Rp 99.000",
+    "priceNumber": 99000,
+    "originalPrice": "Rp 199.000",
+    "period": "Akses 3 Bulan",
+    "description": "Paket hemat untuk pemula yang ingin memulai persiapan ujian SKD.",
+    "popular": false,
+    "features": [
+      "10x Simulasi Try Out CAT Mandiri",
+      "Rangkuman PDF Kisi-Kisi BKN 2026",
+      "Kunci Jawaban & Pembahasan Lengkap",
+      "Grafik Peringkat Nasional"
+    ]
+  },
+  {
+    "id": "paket-garuda-pro",
+    "name": "Paket Garuda PRO",
+    "price": "Rp 199.000",
+    "priceNumber": 199000,
+    "originalPrice": "Rp 399.000",
+    "period": "Akses 6 Bulan",
+    "description": "Pilihan terfavorit dengan ribuan bank soal dan analisa pintar kelulusan.",
+    "popular": true,
+    "features": [
+      "35x Simulasi Try Out Sistem CAT BKN",
+      "Akses 150+ Video Pembahasan Mentor",
+      "Analitik AI Pemetaan Kelemahan Sub-bab",
+      "Grup Diskusi Pejuang NIP & Mentor ASN",
+      "Garansi Soal Terupdate Sesuai PermenPANRB"
+    ]
+  },
+  {
+    "id": "paket-intensif-asn",
+    "name": "Paket Intensif Bimbingan",
+    "price": "Rp 349.000",
+    "priceNumber": 349000,
+    "originalPrice": "Rp 599.000",
+    "period": "Akses 12 Bulan",
+    "description": "Program karantina belajar intensif dengan live zoom bersama praktisi.",
+    "popular": false,
+    "features": [
+      "Semua fitur Paket Garuda PRO",
+      "12x Live Zoom Mentoring Eksklusif",
+      "Review Portofolio & Konsultasi Formasi",
+      "Simulasi Ujian Akbar Berhadiah Nasional",
+      "Akses Materi SKB (Seleksi Kompetensi Bidang)"
+    ]
+  }
+]
