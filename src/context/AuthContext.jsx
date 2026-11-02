@@ -97,12 +97,16 @@ export const AuthProvider = ({ children }) => {
     });
 
     // Pasang listener status auth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const profileUser = await fetchUserProfile(session.user);
         if (profileUser && isMounted) {
           setUser(profileUser);
           setIsAuthenticated(true);
+        }
+        // Jika login via OAuth baru selesai (URL berisi token), otomatis arahkan ke dashboard
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && window.location.hash.includes('access_token')) {
+          window.location.replace('/dashboard');
         }
       } else if (isMounted) {
         setUser(null);

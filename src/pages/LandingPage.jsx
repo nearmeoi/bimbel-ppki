@@ -3,6 +3,7 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { OutlineCard } from '../components/cards/OutlineCard';
 import AssetPlaceholder from '../components/ui/AssetPlaceholder';
+import { useAuth } from '../context/AuthContext';
 import {
   StickerStar,
   StickerLightning,
@@ -50,6 +51,7 @@ import {
  *   10. Expanded 4-Column Footer with Area Admin link
  */
 export const LandingPage = ({ onNavigate }) => {
+  const { isAuthenticated } = useAuth();
   // FAQ accordion state
   const [openFaq, setOpenFaq] = useState(0);
   // Pricing billing toggle
@@ -121,22 +123,35 @@ export const LandingPage = ({ onNavigate }) => {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline-white"
-              size="sm"
-              onClick={() => onNavigate && onNavigate('/masuk')}
-              className="px-5 font-black"
-            >
-              Masuk
-            </Button>
-            <Button
-              variant="accent"
-              size="sm"
-              onClick={() => onNavigate && onNavigate('/daftar')}
-              className="px-5 font-black shadow-neo-sm"
-            >
-              Daftar Gratis
-            </Button>
+            {isAuthenticated ? (
+              <Button
+                variant="accent"
+                size="sm"
+                onClick={() => onNavigate && onNavigate('/dashboard')}
+                className="px-5 font-black shadow-neo-sm"
+              >
+                Buka Dashboard
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="outline-white"
+                  size="sm"
+                  onClick={() => onNavigate && onNavigate('/masuk')}
+                  className="px-5 font-black"
+                >
+                  Masuk
+                </Button>
+                <Button
+                  variant="accent"
+                  size="sm"
+                  onClick={() => onNavigate && onNavigate('/daftar')}
+                  className="px-5 font-black shadow-neo-sm"
+                >
+                  Daftar Gratis
+                </Button>
+              </>
+            )}
           </div>
         </header>
 
@@ -170,11 +185,11 @@ export const LandingPage = ({ onNavigate }) => {
               <Button
                 variant="accent"
                 size="lg"
-                onClick={() => onNavigate && onNavigate('/daftar')}
+                onClick={() => onNavigate && onNavigate(isAuthenticated ? '/dashboard' : '/daftar')}
                 className="text-base md:text-lg px-8 font-black shadow-neo hover:shadow-neo-hover"
                 rightIcon={<ArrowRight size={20} />}
               >
-                Mulai Belajar Sekarang — Gratis
+                {isAuthenticated ? 'Lanjutkan Belajar' : 'Mulai Belajar Sekarang — Gratis'}
               </Button>
               <Button
                 variant="outline-white"
@@ -689,9 +704,9 @@ export const LandingPage = ({ onNavigate }) => {
               variant="outline"
               fullWidth
               className="mt-8 font-black"
-              onClick={() => onNavigate && onNavigate('/daftar')}
+              onClick={() => onNavigate && onNavigate(isAuthenticated ? '/dashboard' : '/daftar')}
             >
-              Mulai Gratis
+              {isAuthenticated ? 'Buka Dashboard' : 'Mulai Gratis'}
             </Button>
           </OutlineCard>
 
@@ -941,11 +956,11 @@ export const LandingPage = ({ onNavigate }) => {
                 <Button
                   variant="accent"
                   size="lg"
-                  onClick={() => onNavigate && onNavigate('/daftar')}
+                  onClick={() => onNavigate && onNavigate(isAuthenticated ? '/dashboard' : '/daftar')}
                   className="text-base font-black px-8 shadow-neo hover:shadow-neo-hover"
                   rightIcon={<ArrowRight size={20} />}
                 >
-                  Mulai Belajar Sekarang — Gratis
+                  {isAuthenticated ? 'Lanjutkan Belajar' : 'Mulai Belajar Sekarang — Gratis'}
                 </Button>
                 <a
                   href="https://wa.me/6281234567890?text=Halo%20Bimbel,%20saya%20ingin%20konsultasi%20paket%20CPNS"
