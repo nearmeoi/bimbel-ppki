@@ -5,6 +5,7 @@ import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Mail, CheckCircle2 } from 'lucide-react';
 import { useToast } from '../../components/ui/Toast';
+import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 
 /**
  * Bimbel Forgot Password Screen (/lupa-password)
@@ -15,11 +16,23 @@ export const ForgotPasswordPage = ({ onNavigate }) => {
   const toast = useToast();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSent(true);
-    toast.success('Tautan pemulihan kata sandi telah dikirim ke email Anda!');
+    setLoading(true);
+    try {
+      if (isSupabaseConfigured) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim());
+        if (error) throw error;
+      }
+      setSent(true);
+      toast.success('Tautan pemulihan kata sandi telah dikirim ke email Anda!');
+    } catch (err) {
+      toast.error(err.message || 'Gagal mengirim tautan reset password.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,7 +71,7 @@ export const ForgotPasswordPage = ({ onNavigate }) => {
               required
             />
 
-            <Button variant="primary" fullWidth type="submit" className="py-3.5">
+            <Button variant="primary" fullWidth type="submit" loading={loading} className="py-3.5">
               Kirim Tautan Pemulihan
             </Button>
           </form>
