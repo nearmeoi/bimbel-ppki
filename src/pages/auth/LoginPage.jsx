@@ -139,7 +139,7 @@ export const LoginPage = ({ onNavigate }) => {
         <p className="text-center text-sm font-medium text-gray-700">
           Belum punya akun?{' '}
           <button
-            onClick={() => onNavigate && onNavigate('/onboarding')}
+            onClick={() => onNavigate && onNavigate('/daftar')}
             className="text-primary font-bold hover:underline cursor-pointer"
           >
             Daftar

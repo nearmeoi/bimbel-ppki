@@ -132,7 +132,7 @@ export const LandingPage = ({ onNavigate }) => {
             <Button
               variant="accent"
               size="sm"
-              onClick={() => onNavigate && onNavigate('/onboarding')}
+              onClick={() => onNavigate && onNavigate('/daftar')}
               className="px-5 font-black shadow-neo-sm"
             >
               Daftar Gratis
@@ -170,7 +170,7 @@ export const LandingPage = ({ onNavigate }) => {
               <Button
                 variant="accent"
                 size="lg"
-                onClick={() => onNavigate && onNavigate('/onboarding')}
+                onClick={() => onNavigate && onNavigate('/daftar')}
                 className="text-base md:text-lg px-8 font-black shadow-neo hover:shadow-neo-hover"
                 rightIcon={<ArrowRight size={20} />}
               >
@@ -689,7 +689,7 @@ export const LandingPage = ({ onNavigate }) => {
               variant="outline"
               fullWidth
               className="mt-8 font-black"
-              onClick={() => onNavigate && onNavigate('/onboarding')}
+              onClick={() => onNavigate && onNavigate('/daftar')}
             >
               Mulai Gratis
             </Button>
@@ -941,7 +941,7 @@ export const LandingPage = ({ onNavigate }) => {
                 <Button
                   variant="accent"
                   size="lg"
-                  onClick={() => onNavigate && onNavigate('/onboarding')}
+                  onClick={() => onNavigate && onNavigate('/daftar')}
                   className="text-base font-black px-8 shadow-neo hover:shadow-neo-hover"
                   rightIcon={<ArrowRight size={20} />}
                 >
