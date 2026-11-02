@@ -18,8 +18,8 @@ export const ProfilPage = ({ onNavigate }) => {
   const { user, updateProfile, logout } = useAuth();
   const toast = useToast();
 
-  const [targetInstansi, setTargetInstansi] = useState(user.targetInstansi || 'Kemenkumham RI');
-  const [targetScore, setTargetScore] = useState(user.targetScore || 450);
+  const [targetInstansi, setTargetInstansi] = useState(user?.targetInstansi || 'Kemenkumham RI');
+  const [targetScore, setTargetScore] = useState(user?.targetScore || 450);
 
   const handleSaveProfile = async () => {
     await updateProfile({ targetInstansi, targetScore });
@@ -29,7 +29,7 @@ export const ProfilPage = ({ onNavigate }) => {
   const handleLogout = async () => {
     await logout();
     toast.info('Anda telah keluar dari akun.');
-    if (onNavigate) onNavigate('/dashboard');
+    if (onNavigate) onNavigate('/masuk');
   };
 
   return (
@@ -44,13 +44,13 @@ export const ProfilPage = ({ onNavigate }) => {
 
         {/* User Card */}
         <OutlineCard className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
-          <Avatar name={user.name} size="xl" medal="gold" />
+          <Avatar name={user?.name || 'Siswa'} size="xl" medal="gold" />
           <div className="flex-1 space-y-2">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <h2 className="text-2xl font-extrabold text-ink">{user.name}</h2>
-              <Badge variant="accent">PRO MEMBER</Badge>
+              <h2 className="text-2xl font-extrabold text-ink">{user?.name || 'Calon ASN'}</h2>
+              {user?.isPro && <Badge variant="accent">PRO MEMBER</Badge>}
             </div>
-            <p className="text-xs md:text-sm text-gray-500 font-medium">{user.email}</p>
+            <p className="text-xs md:text-sm text-gray-500 font-medium">{user?.email || '-'}</p>
             <p className="text-xs font-semibold text-primary">
               Target Formasi: {targetInstansi}
             </p>

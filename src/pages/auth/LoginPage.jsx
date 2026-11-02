@@ -4,6 +4,7 @@ import { OutlineCard } from '../../components/cards/OutlineCard';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Mail, Lock } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/ui/Toast';
 
@@ -16,6 +17,9 @@ import { useToast } from '../../components/ui/Toast';
 export const LoginPage = ({ onNavigate }) => {
   const { login } = useAuth();
   const toast = useToast();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/dashboard';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,7 +30,7 @@ export const LoginPage = ({ onNavigate }) => {
     try {
       await login(email, password);
       toast.success('Selamat datang kembali, calon ASN!');
-      if (onNavigate) onNavigate('/dashboard');
+      if (onNavigate) onNavigate(from);
     } catch (err) {
       toast.error(err.message || 'Gagal masuk. Periksa kembali email dan kata sandi Anda.');
     } finally {
@@ -38,7 +42,7 @@ export const LoginPage = ({ onNavigate }) => {
     try {
       await login('calon.asn@gmail.com', 'demo');
       toast.success('Berhasil masuk menggunakan akun Google!');
-      if (onNavigate) onNavigate('/dashboard');
+      if (onNavigate) onNavigate(from);
     } catch (err) {
       toast.error(err.message || 'Gagal masuk dengan Google.');
     }

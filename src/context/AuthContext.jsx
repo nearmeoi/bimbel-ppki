@@ -16,17 +16,20 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('bimbel_user');
-      return saved ? JSON.parse(saved) : DEFAULT_USER;
+      if (saved) return JSON.parse(saved);
+      return isSupabaseConfigured ? null : DEFAULT_USER;
     } catch {
-      return DEFAULT_USER;
+      return isSupabaseConfigured ? null : DEFAULT_USER;
     }
   });
 
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     try {
-      return localStorage.getItem('bimbel_auth') === 'true';
+      const saved = localStorage.getItem('bimbel_auth');
+      if (saved !== null) return saved === 'true';
+      return !isSupabaseConfigured; // hanya default true pada demo lokal tanpa backend
     } catch {
-      return true; // default true for showcase/demo
+      return !isSupabaseConfigured;
     }
   });
 
@@ -80,6 +83,15 @@ export const AuthProvider = ({ children }) => {
           setUser(profileUser);
           setIsAuthenticated(true);
         }
+      } else if (isMounted) {
+        setUser(null);
+        setIsAuthenticated(false);
+        try {
+          localStorage.removeItem('bimbel_user');
+          localStorage.removeItem('bimbel_auth');
+        } catch (e) {
+          console.warn(e);
+        }
       }
       setLoading(false);
     });
@@ -93,7 +105,14 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
         }
       } else if (isMounted) {
+        setUser(null);
         setIsAuthenticated(false);
+        try {
+          localStorage.removeItem('bimbel_user');
+          localStorage.removeItem('bimbel_auth');
+        } catch (e) {
+          console.warn(e);
+        }
       }
     });
 
@@ -106,8 +125,13 @@ export const AuthProvider = ({ children }) => {
   // Simpan ke localStorage sebagai sinkronisasi offline
   useEffect(() => {
     try {
-      localStorage.setItem('bimbel_user', JSON.stringify(user));
-      localStorage.setItem('bimbel_auth', String(isAuthenticated));
+      if (isAuthenticated && user) {
+        localStorage.setItem('bimbel_user', JSON.stringify(user));
+        localStorage.setItem('bimbel_auth', 'true');
+      } else {
+        localStorage.removeItem('bimbel_user');
+        localStorage.setItem('bimbel_auth', 'false');
+      }
     } catch (e) {
       console.warn('Gagal menyimpan status auth ke localStorage', e);
     }
@@ -190,7 +214,14 @@ export const AuthProvider = ({ children }) => {
         console.warn('Gagal logout dari Supabase:', err);
       }
     }
+    setUser(null);
     setIsAuthenticated(false);
+    try {
+      localStorage.removeItem('bimbel_user');
+      localStorage.removeItem('bimbel_auth');
+    } catch (e) {
+      console.warn(e);
+    }
   };
 
   const updateProfile = async (fields) => {

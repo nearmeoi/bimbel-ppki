@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
+import { Routes, Route, useNavigate, useParams, Navigate, useLocation } from 'react-router-dom';
 import { Skeleton } from '../components/ui/Skeleton';
+import { useAuth } from '../context/AuthContext';
 
 // Core User Pages
 import { LandingPage } from '../pages/LandingPage';
@@ -45,9 +46,45 @@ const PageLoadingFallback = () => (
   </div>
 );
 
+// Wrapper route biasa (publik)
 const RouteWrapper = ({ Component, ...rest }) => {
   const navigate = useNavigate();
   const params = useParams();
+  return <Component onNavigate={navigate} params={params} {...rest} />;
+};
+
+// Route khusus tamu (akan dialihkan ke /dashboard jika sudah login)
+const GuestRoute = ({ Component, ...rest }) => {
+  const { isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+  const params = useParams();
+
+  if (loading) return <PageLoadingFallback />;
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+  return <Component onNavigate={navigate} params={params} {...rest} />;
+};
+
+// Route terproteksi (harus sudah login, jika belum dialihkan ke /masuk)
+const ProtectedRoute = ({ Component, ...rest }) => {
+  const { isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+  const params = useParams();
+  const location = useLocation();
+
+  if (loading) return <PageLoadingFallback />;
+  if (!isAuthenticated) return <Navigate to="/masuk" state={{ from: location }} replace />;
+  return <Component onNavigate={navigate} params={params} {...rest} />;
+};
+
+// Route khusus Administrator
+const AdminRoute = ({ Component, ...rest }) => {
+  const { user, isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+  const params = useParams();
+
+  if (loading) return <PageLoadingFallback />;
+  if (!isAuthenticated) return <Navigate to="/masuk" replace />;
+  if (user?.role !== 'admin') return <Navigate to="/dashboard" replace />;
   return <Component onNavigate={navigate} params={params} {...rest} />;
 };
 
@@ -58,40 +95,40 @@ export const AppRoutes = () => {
         {/* Landing & Public */}
         <Route path="/" element={<RouteWrapper Component={LandingPage} />} />
 
-        {/* Auth Routes */}
-        <Route path="/masuk" element={<RouteWrapper Component={LoginPage} />} />
-        <Route path="/daftar" element={<RouteWrapper Component={RegisterPage} />} />
-        <Route path="/lupa-password" element={<RouteWrapper Component={ForgotPasswordPage} />} />
-        <Route path="/onboarding" element={<RouteWrapper Component={OnboardingPage} />} />
+        {/* Auth / Guest Routes */}
+        <Route path="/masuk" element={<GuestRoute Component={LoginPage} />} />
+        <Route path="/daftar" element={<GuestRoute Component={RegisterPage} />} />
+        <Route path="/lupa-password" element={<GuestRoute Component={ForgotPasswordPage} />} />
 
-        {/* Student App Portal */}
-        <Route path="/dashboard" element={<RouteWrapper Component={DashboardPage} />} />
-        <Route path="/materi" element={<RouteWrapper Component={MateriPage} />} />
-        <Route path="/materi/:id" element={<RouteWrapper Component={MateriDetailPage} />} />
-        <Route path="/latihan" element={<RouteWrapper Component={LatihanPage} />} />
-        <Route path="/latihan/:id/kerjakan" element={<RouteWrapper Component={ExamPage} />} />
-        <Route path="/tryout" element={<RouteWrapper Component={LatihanPage} />} />
-        <Route path="/hasil/:id" element={<RouteWrapper Component={HasilPage} />} />
-        <Route path="/hasil/:id/pembahasan" element={<RouteWrapper Component={PembahasanPage} />} />
-        <Route path="/rangking" element={<RouteWrapper Component={RangkingPage} />} />
-        <Route path="/jadwal" element={<RouteWrapper Component={JadwalPage} />} />
-        <Route path="/analitik" element={<RouteWrapper Component={AnalitikPage} />} />
-        <Route path="/paket" element={<RouteWrapper Component={PaketPage} />} />
-        <Route path="/paket/checkout" element={<RouteWrapper Component={CheckoutPage} />} />
-        <Route path="/sukses" element={<RouteWrapper Component={SuccessPaymentPage} />} />
-        <Route path="/profil" element={<RouteWrapper Component={ProfilPage} />} />
+        {/* Protected Student Portal Routes */}
+        <Route path="/onboarding" element={<ProtectedRoute Component={OnboardingPage} />} />
+        <Route path="/dashboard" element={<ProtectedRoute Component={DashboardPage} />} />
+        <Route path="/materi" element={<ProtectedRoute Component={MateriPage} />} />
+        <Route path="/materi/:id" element={<ProtectedRoute Component={MateriDetailPage} />} />
+        <Route path="/latihan" element={<ProtectedRoute Component={LatihanPage} />} />
+        <Route path="/latihan/:id/kerjakan" element={<ProtectedRoute Component={ExamPage} />} />
+        <Route path="/tryout" element={<ProtectedRoute Component={LatihanPage} />} />
+        <Route path="/hasil/:id" element={<ProtectedRoute Component={HasilPage} />} />
+        <Route path="/hasil/:id/pembahasan" element={<ProtectedRoute Component={PembahasanPage} />} />
+        <Route path="/rangking" element={<ProtectedRoute Component={RangkingPage} />} />
+        <Route path="/jadwal" element={<ProtectedRoute Component={JadwalPage} />} />
+        <Route path="/analitik" element={<ProtectedRoute Component={AnalitikPage} />} />
+        <Route path="/paket" element={<ProtectedRoute Component={PaketPage} />} />
+        <Route path="/paket/checkout" element={<ProtectedRoute Component={CheckoutPage} />} />
+        <Route path="/sukses" element={<ProtectedRoute Component={SuccessPaymentPage} />} />
+        <Route path="/profil" element={<ProtectedRoute Component={ProfilPage} />} />
 
-        {/* Dev / Showcase */}
+        {/* Dev / Component Showcase */}
         <Route path="/komponen" element={<RouteWrapper Component={ComponentSheetPage} />} />
 
-        {/* Admin Portal (Lazy Loaded) */}
-        <Route path="/admin" element={<RouteWrapper Component={AdminDashboardPage} />} />
-        <Route path="/admin/dashboard" element={<RouteWrapper Component={AdminDashboardPage} />} />
-        <Route path="/admin/soal" element={<RouteWrapper Component={AdminSoalPage} />} />
-        <Route path="/admin/materi" element={<RouteWrapper Component={AdminMateriPage} />} />
-        <Route path="/admin/pengumuman" element={<RouteWrapper Component={AdminPengumumanPage} />} />
-        <Route path="/admin/jadwal" element={<RouteWrapper Component={AdminJadwalPage} />} />
-        <Route path="/admin/pengguna" element={<RouteWrapper Component={AdminPenggunaPage} />} />
+        {/* Admin Portal (Admin Role Guard) */}
+        <Route path="/admin" element={<AdminRoute Component={AdminDashboardPage} />} />
+        <Route path="/admin/dashboard" element={<AdminRoute Component={AdminDashboardPage} />} />
+        <Route path="/admin/soal" element={<AdminRoute Component={AdminSoalPage} />} />
+        <Route path="/admin/materi" element={<AdminRoute Component={AdminMateriPage} />} />
+        <Route path="/admin/pengumuman" element={<AdminRoute Component={AdminPengumumanPage} />} />
+        <Route path="/admin/jadwal" element={<AdminRoute Component={AdminJadwalPage} />} />
+        <Route path="/admin/pengguna" element={<AdminRoute Component={AdminPenggunaPage} />} />
 
         {/* 404 Wildcard Fallback */}
         <Route path="/404" element={<RouteWrapper Component={NotFoundPage} />} />
