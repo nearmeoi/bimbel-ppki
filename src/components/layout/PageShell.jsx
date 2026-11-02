@@ -2,6 +2,7 @@ import React from 'react';
 import { AppHeader } from './AppHeader';
 import { MobileBottomNav } from './MobileBottomNav';
 import { Footer } from './Footer';
+import { useAuth } from '../../context/AuthContext';
 
 /**
  * Bimbel Core Page Shell Component
@@ -26,8 +27,11 @@ export const PageShell = ({
   showFooter = false,
   bgClass = 'bg-bglight',
   className = '',
-  user,
+  user: explicitUser,
 }) => {
+  const { user: authUser } = useAuth();
+  const currentUser = explicitUser || authUser;
+
   return (
     <div className="min-h-screen flex flex-col font-sans bg-primary antialiased selection:bg-accent selection:text-black">
       {/* Blue Top App Bar */}
@@ -35,7 +39,7 @@ export const PageShell = ({
         <AppHeader
           currentPath={currentPath}
           onNavigate={onNavigate}
-          user={user}
+          user={currentUser}
         />
       )}
 

@@ -17,6 +17,7 @@ import {
   Legend,
 } from 'recharts';
 import { AlertCircle, Target, Award, TrendingUp } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 /**
  * Bimbel Analitik Nilai & Diagnosa Kelemahan Screen
@@ -24,10 +25,12 @@ import { AlertCircle, Target, Award, TrendingUp } from 'lucide-react';
  * @param {Function} props.onNavigate
  */
 export const AnalitikPage = ({ onNavigate }) => {
+  const { user } = useAuth();
   const { summary, scoreHistory, subjectPerformance, weakTopics } = analitikData;
+  const userTargetScore = user?.targetScore || summary.targetScore || 450;
 
   return (
-    <PageShell currentPath="/analitik" onNavigate={onNavigate}>
+    <PageShell currentPath="/analitik" onNavigate={onNavigate} user={user}>
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-ink">Analitik &amp; Performa</h1>
@@ -39,7 +42,7 @@ export const AnalitikPage = ({ onNavigate }) => {
         {/* Stats Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StatCard value={summary.averageScore} label="Rata-rata Skor" />
-          <StatCard value={summary.targetScore} label="Target Skor Anda" />
+          <StatCard value={userTargetScore} label="Target Skor Anda" />
           <StatCard value={summary.highestScore} label="Skor Tertinggi" />
           <StatCard value={summary.passingRate} label="Tingkat Kelulusan PG" />
         </div>

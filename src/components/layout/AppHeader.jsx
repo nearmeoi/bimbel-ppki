@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { Badge } from '../ui/Badge';
+import { useAuth } from '../../context/AuthContext';
 
 /**
  * Bimbel AppHeader Component
@@ -27,8 +28,10 @@ import { Badge } from '../ui/Badge';
 export const AppHeader = ({
   currentPath = '/dashboard',
   onNavigate,
-  user = { name: 'Budi', email: 'budi@gmail.com', role: 'student', isPro: false },
+  user: propUser,
 }) => {
+  const { user: authUser, logout } = useAuth();
+  const user = propUser || authUser || { name: 'Siswa', email: '', role: 'student', isPro: false };
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
@@ -149,8 +152,11 @@ export const AppHeader = ({
             </button>
             <div className="border-t border-gray-100 my-1" />
             <button
-              onClick={() => handleNavClick('/masuk')}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-black text-red-600 rounded-xl hover:bg-red-50 text-left transition-colors"
+              onClick={async () => {
+                await logout();
+                handleNavClick('/masuk');
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-black text-red-600 rounded-xl hover:bg-red-50 text-left transition-colors cursor-pointer"
             >
               <LogOut size={16} /> Keluar Akun
             </button>
