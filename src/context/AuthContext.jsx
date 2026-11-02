@@ -246,11 +246,6 @@ export const AuthProvider = ({ children }) => {
     setUser((prev) => ({ ...prev, ...fields }));
   };
 
-  const promoteToAdmin = async () => {
-    await updateProfile({ role: 'admin' });
-    return true;
-  };
-
   const signInWithGoogle = async () => {
     if (isSupabaseConfigured) {
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -283,7 +278,6 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         signInWithGoogle,
-        promoteToAdmin,
         logout,
         updateProfile,
       }}

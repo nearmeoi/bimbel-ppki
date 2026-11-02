@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route, useNavigate, useParams, Navigate, useLocation } from 'react-router-dom';
 import { Skeleton } from '../components/ui/Skeleton';
 import { useAuth } from '../context/AuthContext';
@@ -76,55 +76,18 @@ const ProtectedRoute = ({ Component, ...rest }) => {
   return <Component onNavigate={navigate} params={params} {...rest} />;
 };
 
-// Route khusus Administrator
+// Route khusus Administrator (hanya dapat diakses jika user.role === 'admin')
 const AdminRoute = ({ Component, ...rest }) => {
-  const { user, isAuthenticated, loading, promoteToAdmin } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
   const params = useParams();
-  const [upgrading, setUpgrading] = useState(false);
 
   if (loading) return <PageLoadingFallback />;
   if (!isAuthenticated) return <Navigate to="/masuk" replace />;
 
+  // Jika bukan admin, tolak akses dan arahkan kembali ke dashboard
   if (user?.role !== 'admin') {
-    return (
-      <div className="min-h-screen bg-bglight flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white border-2 border-black rounded-neo p-6 text-center shadow-neo space-y-4">
-          <div className="w-16 h-16 bg-accent rounded-full border-2 border-black flex items-center justify-center mx-auto shadow-neo-sm">
-            <span className="text-3xl">🛡️</span>
-          </div>
-          <h2 className="text-2xl font-extrabold text-ink">Akses Panel Admin</h2>
-          <p className="text-sm text-gray-600 font-medium">
-            Akun Anda (<strong>{user?.email || 'User'}</strong>) saat ini masih berstatus <strong>Siswa (Student)</strong>.
-          </p>
-          <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-3 text-xs text-amber-900 font-bold text-left">
-            💡 Sebagai pemilik platform, Anda dapat mengaktifkan hak akses Administrator langsung dengan tombol di bawah:
-          </div>
-          <div className="flex flex-col gap-2.5 pt-2">
-            <button
-              onClick={async () => {
-                setUpgrading(true);
-                try {
-                  await promoteToAdmin();
-                } finally {
-                  setUpgrading(false);
-                }
-              }}
-              disabled={upgrading}
-              className="w-full py-3 px-4 bg-primary text-white font-extrabold rounded-full border-2 border-black shadow-neo hover:shadow-neo-hover hover:bg-primary-hover transition-all cursor-pointer"
-            >
-              {upgrading ? 'Mengaktifkan...' : 'Aktifkan Hak Akses Admin Sekarang'}
-            </button>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="w-full py-2.5 px-4 bg-white text-ink font-bold rounded-full border-2 border-black shadow-neo-sm hover:bg-gray-100 transition-all cursor-pointer text-sm"
-            >
-              Kembali ke Dashboard Siswa
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <Component onNavigate={navigate} params={params} {...rest} />;

@@ -161,12 +161,14 @@ export const AppHeader = ({
             >
               <Trophy size={16} /> Analitik Nilai
             </button>
-            <button
-              onClick={() => handleNavClick('/admin/dashboard')}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-bold rounded-xl hover:bg-surfacelight text-left transition-colors"
-            >
-              <ShieldCheck size={16} /> Panel Admin
-            </button>
+            {user?.role === 'admin' && (
+              <button
+                onClick={() => handleNavClick('/admin/dashboard')}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-bold rounded-xl hover:bg-surfacelight text-left transition-colors"
+              >
+                <ShieldCheck size={16} /> Panel Admin
+              </button>
+            )}
             <div className="border-t border-gray-100 my-1" />
             <button
               onClick={async () => {

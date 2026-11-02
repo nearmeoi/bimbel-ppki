@@ -7,7 +7,7 @@ import { Badge } from '../components/ui/Badge';
 import { Select } from '../components/ui/Select';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
-import { User, Target, Award, LogOut, CheckCircle, Shield, ShieldCheck, ArrowRight } from 'lucide-react';
+import { User, Target, Award, LogOut, CheckCircle, Shield, ArrowRight } from 'lucide-react';
 
 /**
  * Bimbel Profil Pengguna Screen
@@ -15,9 +15,8 @@ import { User, Target, Award, LogOut, CheckCircle, Shield, ShieldCheck, ArrowRig
  * @param {Function} props.onNavigate
  */
 export const ProfilPage = ({ onNavigate }) => {
-  const { user, updateProfile, promoteToAdmin, logout } = useAuth();
+  const { user, updateProfile, logout } = useAuth();
   const toast = useToast();
-  const [upgrading, setUpgrading] = useState(false);
 
   const [targetInstansi, setTargetInstansi] = useState(user?.targetInstansi || 'Kemenkumham RI');
   const [targetScore, setTargetScore] = useState(user?.targetScore || 450);
@@ -63,26 +62,22 @@ export const ProfilPage = ({ onNavigate }) => {
           </div>
         </OutlineCard>
 
-        {/* Admin Access Panel Box */}
-        <OutlineCard className="space-y-4 bg-gradient-to-br from-white to-blue-50/50">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <Shield className="text-primary" size={22} />
-              <h2 className="text-lg md:text-xl font-extrabold text-ink">Hak Akses & Panel Admin</h2>
-            </div>
-            {user?.role === 'admin' ? (
+        {/* Admin Access Panel Box (Hanya Tampil Jika Pengguna adalah Administrator) */}
+        {user?.role === 'admin' && (
+          <OutlineCard className="space-y-4 bg-gradient-to-br from-white to-blue-50/50">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Shield className="text-primary" size={22} />
+                <h2 className="text-lg md:text-xl font-extrabold text-ink">Panel Administrator</h2>
+              </div>
               <Badge variant="accent">AKSES AKTIF</Badge>
-            ) : (
-              <Badge variant="surface">AKUN SISWA</Badge>
-            )}
-          </div>
+            </div>
 
-          {user?.role === 'admin' ? (
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-1">
               <div>
                 <p className="text-sm font-bold text-ink">Akun Anda terdaftar sebagai Administrator</p>
                 <p className="text-xs text-gray-600 mt-0.5">
-                  Anda memiliki wewenang mengelola bank soal, materi pembelajaran, jadwal try out, dan data pengguna.
+                  Kelola bank soal CAT, materi kisi-kisi, jadwal try out, dan kelola peran siswa.
                 </p>
               </div>
               <Button
@@ -94,42 +89,8 @@ export const ProfilPage = ({ onNavigate }) => {
                 Buka Panel Admin
               </Button>
             </div>
-          ) : (
-            <div className="space-y-3 pt-1">
-              <p className="text-xs text-gray-600 font-medium">
-                Akun ini saat ini memiliki peran sebagai <strong>Siswa</strong>. Sebagai pembuat / pemilik sistem bimbel ini, Anda dapat mengaktifkan hak akses Administrator langsung:
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Button
-                  variant="primary"
-                  disabled={upgrading}
-                  onClick={async () => {
-                    setUpgrading(true);
-                    try {
-                      await promoteToAdmin();
-                      toast.success('Selamat! Hak akses Administrator berhasil diaktifkan.');
-                    } catch (e) {
-                      toast.error('Gagal mengaktifkan role admin: ' + e.message);
-                    } finally {
-                      setUpgrading(false);
-                    }
-                  }}
-                  leftIcon={<ShieldCheck size={18} />}
-                  className="shadow-neo-sm"
-                >
-                  {upgrading ? 'Mengaktifkan...' : 'Aktifkan Hak Akses Admin Sekarang'}
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => onNavigate && onNavigate('/admin/dashboard')}
-                  className="text-xs"
-                >
-                  Tes Akses /admin
-                </Button>
-              </div>
-            </div>
-          )}
-        </OutlineCard>
+          </OutlineCard>
+        )}
 
         {/* Target Settings */}
         <OutlineCard className="space-y-6">
