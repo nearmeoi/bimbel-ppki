@@ -241,6 +241,29 @@ export const AuthProvider = ({ children }) => {
     setUser((prev) => ({ ...prev, ...fields }));
   };
 
+  const signInWithGoogle = async () => {
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+      if (error) throw error;
+      return data;
+    }
+
+    // Fallback mode demo
+    const newUser = {
+      ...DEFAULT_USER,
+      name: 'Google User',
+      email: 'calon.asn@gmail.com',
+    };
+    setUser(newUser);
+    setIsAuthenticated(true);
+    return true;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -249,6 +272,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         register,
+        signInWithGoogle,
         logout,
         updateProfile,
       }}

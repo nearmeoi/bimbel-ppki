@@ -15,7 +15,7 @@ import { useToast } from '../../components/ui/Toast';
  * @param {Function} props.onNavigate
  */
 export const LoginPage = ({ onNavigate }) => {
-  const { login } = useAuth();
+  const { login, signInWithGoogle } = useAuth();
   const toast = useToast();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/dashboard';
@@ -23,6 +23,7 @@ export const LoginPage = ({ onNavigate }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,12 +40,13 @@ export const LoginPage = ({ onNavigate }) => {
   };
 
   const handleGoogleLogin = async () => {
+    setLoadingGoogle(true);
     try {
-      await login('calon.asn@gmail.com', 'demo');
-      toast.success('Berhasil masuk menggunakan akun Google!');
-      if (onNavigate) onNavigate(from);
+      await signInWithGoogle();
     } catch (err) {
-      toast.error(err.message || 'Gagal masuk dengan Google.');
+      toast.error(err.message || 'Gagal masuk dengan Google. Pastikan Google Auth sudah diaktifkan di Supabase.');
+    } finally {
+      setLoadingGoogle(false);
     }
   };
 
@@ -112,6 +114,7 @@ export const LoginPage = ({ onNavigate }) => {
             fullWidth
             type="button"
             onClick={handleGoogleLogin}
+            loading={loadingGoogle}
             className="gap-3 py-3"
           >
             <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
