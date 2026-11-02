@@ -6,7 +6,18 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 const ExamContext = createContext(null);
 
 export const ExamProvider = ({ children }) => {
-  const [questions, setQuestions] = useState(defaultQuestions);
+  const [questions, setQuestions] = useState(() => {
+    try {
+      const saved = localStorage.getItem('bimbel_bank_soal');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn('Gagal membaca bimbel_bank_soal:', e);
+    }
+    return defaultQuestions;
+  });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const [answers, setAnswers] = useState(() => {

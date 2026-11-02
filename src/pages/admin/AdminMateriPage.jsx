@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AdminLayout } from '../../components/layout/AdminLayout';
 import { OutlineCard } from '../../components/cards/OutlineCard';
 import { Button } from '../../components/ui/Button';
@@ -6,24 +6,77 @@ import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
 import { Select } from '../../components/ui/Select';
-import { Plus, Search, Trash2, BookOpen } from 'lucide-react';
+import { Plus, Search, Trash2, BookOpen, RotateCcw } from 'lucide-react';
 import materiList from '../../data/materi.json';
 import { useToast } from '../../components/ui/Toast';
+import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
+
+const STORAGE_KEY = 'bimbel_materi_list';
 
 export const AdminMateriPage = ({ onNavigate }) => {
   const toast = useToast();
-  const [materis, setMateris] = useState(materiList);
+
+  const [materis, setMateris] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return materiList;
+  });
+
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newType, setNewType] = useState('TWK');
   const [newSummary, setNewSummary] = useState('');
 
-  const handleCreate = (e) => {
+  const persistMateris = (list) => {
+    setMateris(list);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  const fetchFromSupabase = async () => {
+    if (!isSupabaseConfigured) return;
+    try {
+      const { data, error } = await supabase.from('materi').select('*');
+      if (!error && data && data.length > 0) {
+        const mapped = data.map((m) => ({
+          id: m.id,
+          title: m.title,
+          type: m.type,
+          progress: 0,
+          status: 'Belum Mulai',
+          estimatedTime: m.estimated_time || '45 Menit',
+          summary: m.summary || '',
+          chapters: [],
+        }));
+        persistMateris(mapped);
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchFromSupabase();
+  }, []);
+
+  const handleCreate = async (e) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
+
+    const newId = `modul-${Date.now()}`;
     const newItem = {
-      id: `modul-${Date.now()}`,
+      id: newId,
       title: newTitle,
       type: newType,
       progress: 0,
@@ -32,16 +85,50 @@ export const AdminMateriPage = ({ onNavigate }) => {
       summary: newSummary || 'Rangkuman materi pembelajaran SKD terbaru.',
       chapters: [],
     };
-    setMateris([...materis, newItem]);
+
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('materi').insert([
+          {
+            id: newId,
+            title: newTitle,
+            type: newType,
+            summary: newSummary || 'Rangkuman materi pembelajaran SKD terbaru.',
+            estimated_time: '45 Menit',
+          },
+        ]);
+      } catch (err) {
+        console.warn('Gagal insert materi ke Supabase:', err);
+      }
+    }
+
+    const updated = [...materis, newItem];
+    persistMateris(updated);
     setModalOpen(false);
-    toast.success('Modul materi baru berhasil ditambahkan!');
+    toast.success('Modul materi baru berhasil disimpan secara permanen!');
     setNewTitle('');
     setNewSummary('');
   };
 
-  const handleDelete = (id) => {
-    setMateris(materis.filter((m) => m.id !== id));
-    toast.info('Modul materi berhasil dihapus.');
+  const handleDelete = async (id) => {
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('materi').delete().eq('id', id);
+      } catch (err) {
+        console.warn('Gagal delete materi dari Supabase:', err);
+      }
+    }
+
+    const updated = materis.filter((m) => m.id !== id);
+    persistMateris(updated);
+    toast.success('Modul materi berhasil dihapus permanen.');
+  };
+
+  const handleReset = () => {
+    if (window.confirm('Muat ulang daftar materi ke default?')) {
+      persistMateris(materiList);
+      toast.info('Modul materi telah direset ke data awal.');
+    }
   };
 
   const filtered = materis.filter(
@@ -60,13 +147,24 @@ export const AdminMateriPage = ({ onNavigate }) => {
               Daftar modul pembelajaran video, artikel kisi-kisi, dan ringkasan.
             </p>
           </div>
-          <Button
-            variant="primary"
-            leftIcon={<Plus size={18} />}
-            onClick={() => setModalOpen(true)}
-          >
-            Upload Modul Baru
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleReset}
+              leftIcon={<RotateCcw size={14} />}
+              title="Reset ke Modul Default"
+            >
+              Reset
+            </Button>
+            <Button
+              variant="primary"
+              leftIcon={<Plus size={18} />}
+              onClick={() => setModalOpen(true)}
+            >
+              Upload Modul Baru
+            </Button>
+          </div>
         </div>
 
         <Input
@@ -89,25 +187,33 @@ export const AdminMateriPage = ({ onNavigate }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 font-medium">
-                {filtered.map((m, idx) => (
-                  <tr key={m.id} className="hover:bg-gray-50">
-                    <td className="p-4 text-center font-bold text-gray-400">{idx + 1}</td>
-                    <td className="p-4">
-                      <Badge variant={m.type.toLowerCase()}>{m.type}</Badge>
-                    </td>
-                    <td className="p-4 font-bold text-ink">{m.title}</td>
-                    <td className="p-4 text-center text-gray-500">{m.estimatedTime}</td>
-                    <td className="p-4 text-right">
-                      <button
-                        onClick={() => handleDelete(m.id)}
-                        className="p-1.5 rounded-lg border border-black hover:bg-red-50 text-red-600 transition-colors"
-                        title="Hapus Modul"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-gray-500 font-bold">
+                      Tidak ada modul materi ditemukan.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filtered.map((m, idx) => (
+                    <tr key={m.id} className="hover:bg-gray-50">
+                      <td className="p-4 text-center font-bold text-gray-400">{idx + 1}</td>
+                      <td className="p-4">
+                        <Badge variant={m.type.toLowerCase()}>{m.type}</Badge>
+                      </td>
+                      <td className="p-4 font-bold text-ink">{m.title}</td>
+                      <td className="p-4 text-center text-gray-500">{m.estimatedTime}</td>
+                      <td className="p-4 text-right">
+                        <button
+                          onClick={() => handleDelete(m.id)}
+                          className="p-1.5 rounded-lg border border-black hover:bg-red-50 text-red-600 transition-colors cursor-pointer"
+                          title="Hapus Modul Permanen"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
