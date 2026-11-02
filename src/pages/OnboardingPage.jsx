@@ -27,8 +27,8 @@ export const OnboardingPage = ({ onNavigate }) => {
     'Mahkamah Agung RI',
   ];
 
-  const handleFinish = () => {
-    updateProfile({
+  const handleFinish = async () => {
+    await updateProfile({
       targetInstansi: selectedInstansi,
       targetScore: targetScore,
     });

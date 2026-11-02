@@ -20,15 +20,18 @@ export const RegisterPage = ({ onNavigate }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      register({ name, email });
-      setLoading(false);
+    try {
+      await register({ name, email, password });
       toast.success('Pendaftaran akun berhasil! Silakan atur target belajarmu.');
       if (onNavigate) onNavigate('/onboarding');
-    }, 400);
+    } catch (err) {
+      toast.error(err.message || 'Pendaftaran gagal. Periksa kembali format data Anda.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

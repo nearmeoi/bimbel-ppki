@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import defaultQuestions from '../data/soal.json';
 import { evaluateExamSubmission } from '../utils/formatters';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 const ExamContext = createContext(null);
 
@@ -89,10 +90,29 @@ export const ExamProvider = ({ children }) => {
     }
   };
 
-  const submitExam = () => {
+  const submitExam = async (userId = null, setId = 1) => {
     const evaluation = evaluateExamSubmission(answers, questions);
     setExamResult(evaluation);
     setIsSubmitted(true);
+
+    if (isSupabaseConfigured && userId) {
+      try {
+        await supabase.from('exam_attempts').insert({
+          user_id: userId,
+          set_id: setId,
+          answers,
+          flagged,
+          twk_score: evaluation.subjects?.TWK?.score || 0,
+          tiu_score: evaluation.subjects?.TIU?.score || 0,
+          tkp_score: evaluation.subjects?.TKP?.score || 0,
+          total_score: evaluation.totalScore || 0,
+          is_lulus: evaluation.isLulus || false,
+        });
+      } catch (err) {
+        console.warn('Gagal menyimpan hasil try out ke Supabase:', err);
+      }
+    }
+
     return evaluation;
   };
 

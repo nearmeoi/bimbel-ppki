@@ -20,21 +20,28 @@ export const LoginPage = ({ onNavigate }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      login(email, password);
-      setLoading(false);
+    try {
+      await login(email, password);
       toast.success('Selamat datang kembali, calon ASN!');
       if (onNavigate) onNavigate('/dashboard');
-    }, 400);
+    } catch (err) {
+      toast.error(err.message || 'Gagal masuk. Periksa kembali email dan kata sandi Anda.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    login('calon.asn@gmail.com', 'demo');
-    toast.success('Berhasil masuk menggunakan akun Google!');
-    if (onNavigate) onNavigate('/dashboard');
+  const handleGoogleLogin = async () => {
+    try {
+      await login('calon.asn@gmail.com', 'demo');
+      toast.success('Berhasil masuk menggunakan akun Google!');
+      if (onNavigate) onNavigate('/dashboard');
+    } catch (err) {
+      toast.error(err.message || 'Gagal masuk dengan Google.');
+    }
   };
 
   return (

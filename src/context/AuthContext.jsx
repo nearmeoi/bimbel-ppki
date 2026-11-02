@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 const AuthContext = createContext(null);
 
@@ -29,16 +30,108 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
+  const [loading, setLoading] = useState(isSupabaseConfigured);
+
+  // Ambil profil dari tabel profiles berdasarkan user id
+  const fetchUserProfile = async (supabaseUser) => {
+    if (!supabaseUser) return null;
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', supabaseUser.id)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') {
+        console.warn('Gagal memuat profil Supabase:', error);
+      }
+
+      return {
+        id: supabaseUser.id,
+        name: profile?.name || supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'User',
+        email: supabaseUser.email,
+        role: profile?.role || 'student',
+        targetInstansi: profile?.target_instansi || 'Kemenkumham RI',
+        targetScore: profile?.target_score || 450,
+        isPro: profile?.is_pro || false,
+        joinedDate: profile?.created_at ? profile.created_at.slice(0, 10) : '2026-01-15',
+      };
+    } catch (err) {
+      console.warn('Error saat fetch profil Supabase:', err);
+      return null;
+    }
+  };
+
+  // Dengarkan perubahan sesi autentikasi Supabase jika dikonfigurasi
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    // Cek sesi aktif saat komponen mount
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!isMounted) return;
+      if (session?.user) {
+        const profileUser = await fetchUserProfile(session.user);
+        if (profileUser && isMounted) {
+          setUser(profileUser);
+          setIsAuthenticated(true);
+        }
+      }
+      setLoading(false);
+    });
+
+    // Pasang listener status auth
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        const profileUser = await fetchUserProfile(session.user);
+        if (profileUser && isMounted) {
+          setUser(profileUser);
+          setIsAuthenticated(true);
+        }
+      } else if (isMounted) {
+        setIsAuthenticated(false);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription?.unsubscribe();
+    };
+  }, []);
+
+  // Simpan ke localStorage sebagai sinkronisasi offline
   useEffect(() => {
     try {
       localStorage.setItem('bimbel_user', JSON.stringify(user));
       localStorage.setItem('bimbel_auth', String(isAuthenticated));
     } catch (e) {
-      console.warn('Failed to save auth state to localStorage', e);
+      console.warn('Gagal menyimpan status auth ke localStorage', e);
     }
   }, [user, isAuthenticated]);
 
-  const login = (email, password) => {
+  const login = async (email, password) => {
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (error) throw error;
+
+      if (data?.user) {
+        const profileUser = await fetchUserProfile(data.user);
+        if (profileUser) {
+          setUser(profileUser);
+        }
+      }
+      setIsAuthenticated(true);
+      return true;
+    }
+
+    // Fallback mode demo jika Supabase belum terkonfigurasi
     const newUser = {
       ...user,
       email: email || 'user@gmail.com',
@@ -49,7 +142,37 @@ export const AuthProvider = ({ children }) => {
     return true;
   };
 
-  const register = (userData) => {
+  const register = async (userData) => {
+    const { name, email, password, targetInstansi, targetScore } = userData;
+
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: password || '12345678',
+        options: {
+          data: {
+            name: name || email.split('@')[0],
+            target_instansi: targetInstansi || 'Kemenkumham RI',
+            target_score: targetScore || 450,
+          },
+        },
+      });
+      if (error) throw error;
+
+      const newUser = {
+        ...DEFAULT_USER,
+        id: data?.user?.id,
+        name: name || (email ? email.split('@')[0] : 'User'),
+        email: email || 'user@gmail.com',
+        targetInstansi: targetInstansi || 'Kemenkumham RI',
+        targetScore: targetScore || 450,
+      };
+      setUser(newUser);
+      setIsAuthenticated(true);
+      return true;
+    }
+
+    // Fallback mode demo
     const newUser = {
       ...DEFAULT_USER,
       ...userData,
@@ -59,11 +182,31 @@ export const AuthProvider = ({ children }) => {
     return true;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.auth.signOut();
+      } catch (err) {
+        console.warn('Gagal logout dari Supabase:', err);
+      }
+    }
     setIsAuthenticated(false);
   };
 
-  const updateProfile = (fields) => {
+  const updateProfile = async (fields) => {
+    if (isSupabaseConfigured && user?.id) {
+      try {
+        const dbFields = {};
+        if (fields.name) dbFields.name = fields.name;
+        if (fields.targetInstansi) dbFields.target_instansi = fields.targetInstansi;
+        if (fields.targetScore) dbFields.target_score = fields.targetScore;
+        if (fields.isPro !== undefined) dbFields.is_pro = fields.isPro;
+
+        await supabase.from('profiles').update(dbFields).eq('id', user.id);
+      } catch (err) {
+        console.warn('Gagal memperbarui profil di Supabase:', err);
+      }
+    }
     setUser((prev) => ({ ...prev, ...fields }));
   };
 
@@ -72,6 +215,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         isAuthenticated,
+        loading,
         login,
         register,
         logout,
@@ -92,3 +236,4 @@ export const useAuth = () => {
 };
 
 export default AuthContext;
+

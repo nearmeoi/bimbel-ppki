@@ -139,6 +139,8 @@ bimbel/
 │   │   ├── PembahasanPage.jsx
 │   │   ├── ProfilPage.jsx
 │   │   └── RangkingPage.jsx
+│   ├── lib/                 # External Integrations (Supabase Client & Auth State)
+│   │   └── supabaseClient.js
 │   ├── routes/              # React Router v6 Configuration
 │   │   └── AppRoutes.jsx
 │   ├── utils/               # Formatting & Passing Grade Calculations
@@ -146,6 +148,9 @@ bimbel/
 │   ├── App.jsx              # App Root Provider Tree
 │   ├── index.css            # Tailwind Base, Focus Rings & Custom Scrollbar
 │   └── main.jsx             # React DOM Mounting
+├── .env.example             # Supabase Environment Variables Template
+├── supabase_schema.sql      # Supabase DDL, RLS, Functions & Initial Seed SQL
+├── vercel.json              # Vercel SPA Routing Configuration
 ├── index.html
 ├── package.json
 ├── postcss.config.js
@@ -188,17 +193,36 @@ bimbel/
 npm install
 ```
 
-### 2. Run Development Server
+### 2. Configure Supabase (Optional for Cloud Backend)
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+Add your credentials from Supabase Dashboard (**Project Settings -> API**):
+```env
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+```
+> *Note:* If Supabase credentials are not provided, the app automatically runs in **offline/local mock demo mode**, preserving functionality without errors.
+
+To set up your database tables, open Supabase SQL Editor and execute:
+```bash
+supabase_schema.sql
+```
+
+### 3. Run Development Server
 ```bash
 npm run dev
 ```
 Open your browser at `http://localhost:3000`.
 
-### 3. Production Build & Verification
+### 4. Production Build & Deployment
 ```bash
 npm run build
 ```
 Verify the optimized bundles with code-split chunks for `AnalitikPage` and all `Admin` sub-pages.
+
+For **Vercel** deployment, single-page client routing is automatically pre-configured in `vercel.json`.
 
 ---
 

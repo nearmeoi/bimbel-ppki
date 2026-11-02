@@ -21,13 +21,13 @@ export const ProfilPage = ({ onNavigate }) => {
   const [targetInstansi, setTargetInstansi] = useState(user.targetInstansi || 'Kemenkumham RI');
   const [targetScore, setTargetScore] = useState(user.targetScore || 450);
 
-  const handleSaveProfile = () => {
-    updateProfile({ targetInstansi, targetScore });
+  const handleSaveProfile = async () => {
+    await updateProfile({ targetInstansi, targetScore });
     toast.success('Profil dan target kelulusan berhasil diperbarui!');
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     toast.info('Anda telah keluar dari akun.');
     if (onNavigate) onNavigate('/dashboard');
   };

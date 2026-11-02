@@ -7,6 +7,7 @@ import {
   LeaderboardSidebar,
 } from '../features/dashboard';
 import dashboardData from '../data/dashboard.json';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
 import { Skeleton } from '../components/ui/Skeleton';
 import AssetPlaceholder from '../components/ui/AssetPlaceholder';
@@ -21,11 +22,12 @@ import { Play, Sparkles, BookOpen, Layers } from 'lucide-react';
  * 3. 'loading' - Loading skeleton state with pixel-faithful placeholders
  */
 export const DashboardPage = ({ onNavigate }) => {
+  const { user: authUser } = useAuth();
   const toast = useToast();
   const [viewState, setViewState] = useState('active'); // 'active' | 'empty' | 'loading'
 
   const {
-    user,
+    user: mockUser,
     stats,
     continueLesson,
     passingGrade,
@@ -36,6 +38,8 @@ export const DashboardPage = ({ onNavigate }) => {
     currentUserRank,
     insight,
   } = dashboardData;
+
+  const activeUser = authUser?.name ? authUser : mockUser;
 
   const handleSelectAnnouncement = (item) => {
     toast.info(`Membuka pengumuman: ${item.title}`);
@@ -55,7 +59,7 @@ export const DashboardPage = ({ onNavigate }) => {
   };
 
   return (
-    <PageShell currentPath="/dashboard" onNavigate={onNavigate} user={user}>
+    <PageShell currentPath="/dashboard" onNavigate={onNavigate} user={activeUser}>
       {/* Dev / Preview State Switcher Bar */}
       <div className="mb-6 flex items-center justify-between flex-wrap gap-2 rounded-2xl border-2 border-black bg-white px-4 py-2.5 shadow-neo-sm">
         <div className="flex items-center gap-2">
@@ -151,7 +155,7 @@ export const DashboardPage = ({ onNavigate }) => {
           <div className="flex-1 flex flex-col gap-6">
             {/* Greeting with 0 stats */}
             <DashboardHeader
-              userName="Budi"
+              userName={activeUser.name || 'User'}
               stats={[
                 { id: 'soal', value: '0', label: 'Soal Dikerjakan' },
                 { id: 'skor', value: '-', label: 'Rata-rata Skor', sublabel: 'belum ada tes' },
@@ -240,7 +244,7 @@ export const DashboardPage = ({ onNavigate }) => {
             }}
             currentUserRank={{
               rank: null,
-              name: 'Budi Santoso',
+              name: activeUser.name || 'User',
               avatarSrc: null,
               twk: 0,
               tiu: 0,
@@ -268,7 +272,7 @@ export const DashboardPage = ({ onNavigate }) => {
           <div className="flex-1 flex flex-col gap-6">
             {/* Header row: Welcome + Continue action + Realistic Stats */}
             <DashboardHeader
-              userName={user.name}
+              userName={activeUser.name || 'User'}
               stats={stats}
               continueLesson={continueLesson}
             />

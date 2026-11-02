@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Modal } from '../components/ui/Modal';
 import { useExam } from '../context/ExamContext';
+import { useAuth } from '../context/AuthContext';
 import { useTimer } from '../hooks/useTimer';
 import { useToast } from '../components/ui/Toast';
 import { X, Check } from 'lucide-react';
@@ -42,12 +43,13 @@ export const ExamPage = ({ onNavigate }) => {
     },
   });
 
+  const { user } = useAuth();
   const selectedOption = answers[currentQuestion.id];
   const isCurrentFlagged = Boolean(flagged[currentQuestion.id]);
 
-  const handleConfirmSubmit = () => {
+  const handleConfirmSubmit = async () => {
     setConfirmModalOpen(false);
-    submitExam();
+    await submitExam(user?.id, 1);
     toast.success('Ujian berhasil dikumpulkan!');
     if (onNavigate) onNavigate('/hasil/1');
   };
