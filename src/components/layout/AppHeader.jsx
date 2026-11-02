@@ -100,38 +100,55 @@ export const AppHeader = ({
         })}
       </nav>
 
-      {/* User Profile Pill & Dropdown (Desktop) */}
-      <div className="relative hidden md:block">
-        <button
-          onClick={() => setProfileDropdownOpen((prev) => !prev)}
-          className="flex items-center gap-3 p-1.5 pr-3 rounded-full hover:bg-white/10 transition-colors focus-visible:ring-3 focus-visible:ring-accent cursor-pointer min-h-[44px]"
-          aria-expanded={profileDropdownOpen}
-          aria-haspopup="true"
-        >
-          <Avatar name={user.name} size="sm" />
-          <div className="text-left text-xs xl:text-sm">
-            <div className="font-extrabold leading-tight">Hi, {user.name}!</div>
-            <div className="text-blue-200 text-[11px] leading-tight truncate max-w-[120px]">
-              {user.email}
-            </div>
-          </div>
-          <ChevronDown
-            size={16}
-            className={`transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`}
-          />
-        </button>
+      {/* Desktop Actions & User Profile */}
+      <div className="hidden md:flex items-center gap-3">
+        {user?.role === 'admin' && (
+          <button
+            onClick={() => handleNavClick('/admin/dashboard')}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-ink font-extrabold text-xs rounded-full border-2 border-black shadow-neo-sm hover:translate-y-[-1px] transition-transform cursor-pointer"
+            title="Kelola Sistem sebagai Administrator"
+          >
+            <ShieldCheck size={16} />
+            <span>PANEL ADMIN</span>
+          </button>
+        )}
 
-        {profileDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-56 bg-white border-2 border-black rounded-neo shadow-neo p-2 text-ink z-50 animate-in fade-in slide-in-from-top-2">
-            <div className="px-3 py-2 border-b border-gray-100 mb-1">
-              <p className="font-black text-sm text-ink">{user.name}</p>
-              <p className="text-xs text-gray-500 truncate">{user.email}</p>
-              {user?.isPro && (
-                <span className="inline-block mt-1 px-2 py-0.5 rounded-full border border-black bg-accent text-[10px] font-black uppercase text-ink">
-                  Member Pro Aktif
-                </span>
-              )}
+        {/* User Profile Pill & Dropdown (Desktop) */}
+        <div className="relative">
+          <button
+            onClick={() => setProfileDropdownOpen((prev) => !prev)}
+            className="flex items-center gap-3 p-1.5 pr-3 rounded-full hover:bg-white/10 transition-colors focus-visible:ring-3 focus-visible:ring-accent cursor-pointer min-h-[44px]"
+            aria-expanded={profileDropdownOpen}
+            aria-haspopup="true"
+          >
+            <Avatar name={user.name} size="sm" />
+            <div className="text-left text-xs xl:text-sm">
+              <div className="font-extrabold leading-tight">Hi, {user.name}!</div>
+              <div className="text-blue-200 text-[11px] leading-tight truncate max-w-[120px]">
+                {user.email}
+              </div>
             </div>
+            <ChevronDown
+              size={16}
+              className={`transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+
+          {profileDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-56 bg-white border-2 border-black rounded-neo shadow-neo p-2 text-ink z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="px-3 py-2 border-b border-gray-100 mb-1">
+                <p className="font-black text-sm text-ink">{user.name}</p>
+                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                {user?.role === 'admin' ? (
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded-full border border-black bg-accent text-[10px] font-black uppercase text-ink">
+                    Administrator
+                  </span>
+                ) : user?.isPro ? (
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded-full border border-black bg-accent text-[10px] font-black uppercase text-ink">
+                    Member Pro Aktif
+                  </span>
+                ) : null}
+              </div>
             <button
               onClick={() => handleNavClick('/profil')}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-bold rounded-xl hover:bg-surfacelight text-left transition-colors"
@@ -162,6 +179,7 @@ export const AppHeader = ({
             </button>
           </div>
         )}
+        </div>
       </div>
 
       {/* Hamburger Toggle (Visible when width < 1100px) */}
@@ -193,6 +211,15 @@ export const AppHeader = ({
               </button>
             );
           })}
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => handleNavClick('/admin/dashboard')}
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl font-black text-sm text-left bg-accent text-ink border-2 border-black shadow-neo-sm min-h-[44px]"
+            >
+              <ShieldCheck size={18} />
+              <span>🛡️ Buka Panel Admin</span>
+            </button>
+          )}
           <div className="border-t border-white/20 pt-3 mt-2 flex justify-between items-center px-2">
             <div className="flex items-center gap-2">
               <Avatar name={user.name} size="sm" />

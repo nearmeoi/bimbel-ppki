@@ -235,6 +235,7 @@ export const AuthProvider = ({ children }) => {
         if (fields.name) dbFields.name = fields.name;
         if (fields.targetInstansi) dbFields.target_instansi = fields.targetInstansi;
         if (fields.targetScore) dbFields.target_score = fields.targetScore;
+        if (fields.role) dbFields.role = fields.role;
         if (fields.isPro !== undefined) dbFields.is_pro = fields.isPro;
 
         await supabase.from('profiles').update(dbFields).eq('id', user.id);
@@ -243,6 +244,11 @@ export const AuthProvider = ({ children }) => {
       }
     }
     setUser((prev) => ({ ...prev, ...fields }));
+  };
+
+  const promoteToAdmin = async () => {
+    await updateProfile({ role: 'admin' });
+    return true;
   };
 
   const signInWithGoogle = async () => {
@@ -277,6 +283,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         signInWithGoogle,
+        promoteToAdmin,
         logout,
         updateProfile,
       }}
