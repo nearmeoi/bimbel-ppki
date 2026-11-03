@@ -7,7 +7,7 @@ import { Badge } from '../components/ui/Badge';
 import { Select } from '../components/ui/Select';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
-import { User, Target, Award, LogOut, CheckCircle, Shield, ArrowRight } from 'lucide-react';
+import { User, Target, Award, LogOut, CheckCircle, Shield, ShieldCheck, ArrowRight } from 'lucide-react';
 
 /**
  * Bimbel Profil Pengguna Screen
@@ -50,7 +50,7 @@ export const ProfilPage = ({ onNavigate }) => {
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
               <h2 className="text-2xl font-extrabold text-ink">{user?.name || 'Calon ASN'}</h2>
               {user?.role === 'admin' ? (
-                <Badge variant="accent">🛡️ ADMINISTRATOR</Badge>
+                <Badge variant="accent" className="inline-flex items-center gap-1"><ShieldCheck size={13} /> ADMINISTRATOR</Badge>
               ) : (
                 <Badge variant="surface">SISWA</Badge>
               )}

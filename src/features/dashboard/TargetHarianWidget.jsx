@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, ArrowRight, Target } from 'lucide-react';
+import { Flame, ArrowRight, Target, CheckCircle2 } from 'lucide-react';
 import { ProgressRing } from '../../components/ui/ProgressRing';
 import { OutlineCard } from '../../components/cards/OutlineCard';
 
@@ -32,7 +32,7 @@ export const TargetHarianWidget = ({
 
         {/* Streak Flame Badge */}
         <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border-2 border-black bg-orange-100 text-xs font-black text-orange-600 shadow-neo-sm">
-          <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-600 animate-pulse" />
+          <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-600" />
           <span>{streakDays} Hari Streak</span>
         </div>
       </div>
@@ -59,11 +59,19 @@ export const TargetHarianWidget = ({
             {completed}/{target} <span className="text-xs font-bold text-gray-500">soal hari ini</span>
           </div>
 
-          <p className="text-xs font-bold text-emerald-700 mt-0.5">
-            {remaining > 0
-              ? `🔥 Selesaikan ${remaining} soal lagi untuk penuhi target!`
-              : '🎉 Target harian kamu sudah tercapai! Luar biasa!'}
-          </p>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700 mt-1">
+            {remaining > 0 ? (
+              <>
+                <Flame className="w-3.5 h-3.5 text-orange-500 fill-orange-500 flex-shrink-0" />
+                <span>Selesaikan {remaining} soal lagi untuk target hari ini.</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                <span className="text-emerald-700 font-extrabold">Target harian tercapai! Kerja luar biasa.</span>
+              </>
+            )}
+          </div>
 
           <button
             type="button"

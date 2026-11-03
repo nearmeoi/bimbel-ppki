@@ -6,7 +6,7 @@
     "targetInstansi": "Kemenkumham RI",
     "targetScore": 450,
     "currentRank": 42,
-    "rankDelta": "▲ 3 minggu ini",
+    "rankDelta": "+3 minggu ini",
     "isPro": false
   },
   "continueLesson": {
@@ -188,7 +188,7 @@
     "tiu": 125,
     "tkp": 175,
     "totalScore": 410,
-    "deltaText": "▲ 3 minggu ini",
+    "deltaText": "+3 minggu ini",
     "isCurrentUser": true
   },
   "insight": {

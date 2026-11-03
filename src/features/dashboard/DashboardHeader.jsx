@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Sparkles, BookOpen } from 'lucide-react';
+import { Play, Sparkles, BookOpen, Flame } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { StatCard } from '../../components/cards/StatCard';
 
@@ -50,7 +50,7 @@ export const DashboardHeader = ({
               Lanjutkan Belajar
             </span>
             <span className="block font-black text-xs sm:text-sm text-ink truncate max-w-[200px] sm:max-w-[280px]">
-              {continueLesson.subject} · {continueLesson.title}
+              {continueLesson.subject} • {continueLesson.title}
             </span>
           </div>
         </button>
@@ -66,15 +66,15 @@ export const DashboardHeader = ({
         </button>
       </div>
 
-      {/* Metrics Stat Cards Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+      {/* Metrics Stat Cards Row - 3 balanced columns */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         {stats.map((stat) => (
           <StatCard
             key={stat.id}
             value={stat.value}
             label={stat.label}
             sublabel={stat.sublabel}
-            icon={stat.hasFlame ? <span className="text-orange-500 animate-bounce">🔥</span> : null}
+            icon={stat.hasFlame ? <Flame className="w-5 h-5 text-orange-500 fill-orange-500 flex-shrink-0" /> : null}
           />
         ))}
       </div>

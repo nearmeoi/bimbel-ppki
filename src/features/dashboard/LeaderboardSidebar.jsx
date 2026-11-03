@@ -4,7 +4,7 @@ import { OutlineCard } from '../../components/cards/OutlineCard';
 import { RankRow } from '../../components/cards/RankRow';
 import { InsightCard } from '../../components/cards/InsightCard';
 import { TargetHarianWidget } from './TargetHarianWidget';
-import { Info, Trophy } from 'lucide-react';
+import { Info, Trophy, ArrowRight } from 'lucide-react';
 
 /**
  * Dashboard Leaderboard & Insight Sidebar Component
@@ -25,7 +25,7 @@ export const LeaderboardSidebar = ({
     tiu: 125,
     tkp: 175,
     totalScore: 410,
-    deltaText: '▲ 3 minggu ini',
+    deltaText: '+3 minggu ini',
   },
   passingGrade = {
     label: 'Passing grade, sesuai ketentuan BKN terbaru',
@@ -76,9 +76,10 @@ export const LeaderboardSidebar = ({
             <button
               type="button"
               onClick={onViewLeaderboard || (() => navigate('/rangking'))}
-              className="text-xs font-black text-primary hover:underline cursor-pointer px-2 py-1"
+              className="text-xs font-black text-primary hover:underline cursor-pointer px-2 py-1 inline-flex items-center gap-1"
             >
-              Lihat Semua →
+              <span>Lihat Semua</span>
+              <ArrowRight size={13} />
             </button>
           </div>
 

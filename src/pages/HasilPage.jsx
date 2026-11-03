@@ -77,7 +77,9 @@ export const HasilPage = ({ onNavigate, params }) => {
 
             {/* Total Score Badge Box */}
             <div className="inline-block border-4 border-black rounded-neo-lg px-10 md:px-14 py-6 bg-surfacelight relative shadow-neo-lg select-none">
-              <div className="absolute -top-4 -left-4 text-4xl">🎉</div>
+              <div className="absolute -top-3.5 -left-3.5 w-10 h-10 rounded-full border-2 border-black bg-accent flex items-center justify-center shadow-neo-sm">
+                <Trophy className="w-5 h-5 text-ink" />
+              </div>
               <div className="text-xs md:text-sm font-extrabold text-gray-500 uppercase tracking-widest mb-1">
                 Total Skor Akhir
               </div>

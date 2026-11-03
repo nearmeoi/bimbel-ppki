@@ -158,16 +158,16 @@ export default function AssetPlaceholder({
       >
         <div className="w-10 h-10 rounded-full border-2 border-black bg-white flex items-center justify-center shadow-neo-sm mb-1.5">
           {normalizedLabel.includes('insight') ? (
-            <Brain className="w-5 h-5 text-primary" />
+            <TrendingUp className="w-5 h-5 text-primary" />
           ) : (
             <ShieldCheck className="w-5 h-5 text-ink" />
           )}
         </div>
         <div className="text-[10px] font-black uppercase tracking-wider text-center">
-          {normalizedLabel.includes('insight') ? 'AI PREDIKSI' : 'SISTEM CAT'}
+          {normalizedLabel.includes('insight') ? 'ANALISIS SKOR' : 'SISTEM CAT'}
         </div>
         <div className="text-[9px] font-bold text-gray-700 text-center">
-          {normalizedLabel.includes('insight') ? 'Akurasi 98%' : 'Resmi BKN 2026'}
+          {normalizedLabel.includes('insight') ? 'Berdasarkan Try Out' : 'Resmi BKN 2026'}
         </div>
       </div>
     );
@@ -207,13 +207,12 @@ export default function AssetPlaceholder({
 
           {/* Small badge overlay */}
           <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full border border-black bg-primary text-white flex items-center justify-center text-[10px] font-black shadow-neo-sm">
-            {isSuccess ? '✓' : 'ASN'}
+            {isSuccess ? <Check size={12} strokeWidth={3} /> : 'ASN'}
           </div>
         </div>
 
-        {/* Mascot Name Badge */}
-        <div className="inline-flex items-center gap-1 rounded-full border border-black bg-white px-2.5 py-0.5 shadow-neo-sm text-center">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        {/* Mascot Name Badge (clean without AI pulsing green dot) */}
+        <div className="inline-flex items-center gap-1.5 rounded-full border border-black bg-white px-3 py-0.5 shadow-neo-sm text-center">
           <span className="font-sans text-[11px] font-black uppercase text-ink">
             {isSuccess ? 'Siap Lulus NIP' : isPuzzled ? 'Peta Belajar' : 'Pejuang NIP 2026'}
           </span>

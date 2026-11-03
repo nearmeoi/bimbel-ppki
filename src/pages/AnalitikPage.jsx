@@ -188,7 +188,7 @@ export const AnalitikPage = ({ onNavigate }) => {
             </h2>
           </div>
           <p className="text-xs md:text-sm font-medium text-gray-600">
-            Berdasarkan analisis algoritma pintar, materi di bawah ini memiliki tingkat akurasi paling rendah dan disarankan untuk dipelajari ulang:
+            Berdasarkan riwayat pengerjaan simulasi Anda, modul di bawah ini memiliki tingkat akurasi paling rendah dan disarankan untuk dipelajari ulang:
           </p>
 
           <div className="overflow-x-auto">

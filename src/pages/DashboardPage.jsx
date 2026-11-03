@@ -363,7 +363,7 @@ export const DashboardPage = ({ onNavigate }) => {
             insight={{
               title: 'Selamat bergabung di Bimbel CPNS!',
               description:
-                'Kerjakan minimal 1 set soal diagnostik agar algoritma pintar kami dapat menganalisis kelemahan sub-materi kamu secara akurat.',
+                'Kerjakan minimal 1 set simulasi agar sistem dapat mengevaluasi kelemahan sub-materi kamu secara akurat.',
             }}
             onViewLeaderboard={handleViewLeaderboard}
           />

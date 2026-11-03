@@ -1,11 +1,12 @@
 import React from 'react';
-import { ArrowRight, Sparkles, Brain } from 'lucide-react';
+import { ArrowRight, Sparkles, TrendingUp } from 'lucide-react';
 
 /**
  * Bimbel Signature Gradient Insight Card Component
  * Conforms to revisions:
  * - Gradient darkened to #6D7CF5 -> #4A5CE8 for WCAG AA text contrast
- * - CTA button: "Latihan TKP Sekarang"
+ * - Action button for continuing tailored practice
+ * - Clean professional evaluation badge without AI gimmick slop
  * - Neo-brutalist border-2 border-black & shadow-neo
  */
 export const InsightCard = ({
@@ -29,7 +30,7 @@ export const InsightCard = ({
         <div className="flex-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-black bg-accent text-[11px] font-black uppercase text-ink shadow-neo-sm mb-2.5">
             <Sparkles className="w-3 h-3 text-ink" />
-            Rekomendasi Pintar
+            Rekomendasi Belajar
           </div>
 
           <h3 className="text-lg md:text-xl font-black mb-2 leading-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
@@ -52,17 +53,17 @@ export const InsightCard = ({
           </div>
         </div>
 
-        {/* AI Insight Vector Badge */}
+        {/* Analytics Evaluation Badge */}
         <div className="flex-shrink-0 self-center sm:self-start">
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 border-black bg-accent p-2.5 text-ink shadow-neo flex flex-col items-center justify-center select-none rotate-2">
             <div className="w-10 h-10 rounded-full border-2 border-black bg-white flex items-center justify-center shadow-neo-sm mb-1.5">
-              <Brain className="w-5 h-5 text-primary" />
+              <TrendingUp className="w-5 h-5 text-primary" />
             </div>
             <div className="text-[10px] font-black uppercase tracking-wider text-center leading-tight">
-              AI PREDIKSI
+              EVALUASI SKOR
             </div>
-            <div className="text-[9px] font-bold text-gray-700 text-center">
-              Akurasi 98%
+            <div className="text-[10px] font-bold text-gray-700 text-center">
+              Berdasarkan Try Out
             </div>
           </div>
         </div>

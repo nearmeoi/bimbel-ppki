@@ -5,7 +5,7 @@ import { Input } from '../../components/ui/Input';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Avatar } from '../../components/ui/Avatar';
-import { Search, Shield, RefreshCw, Star } from 'lucide-react';
+import { Search, Shield, ShieldCheck, RefreshCw, Star } from 'lucide-react';
 import { useToast } from '../../components/ui/Toast';
 import { useAuth } from '../../context/AuthContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
@@ -191,7 +191,7 @@ export const AdminPenggunaPage = ({ onNavigate }) => {
                       </td>
                       <td className="p-4 text-center">
                         {u.role === 'admin' ? (
-                          <Badge variant="accent">🛡️ ADMIN</Badge>
+                          <Badge variant="accent" className="inline-flex items-center gap-1"><ShieldCheck size={13} /> ADMIN</Badge>
                         ) : (
                           <Badge variant="surface">SISWA</Badge>
                         )}

@@ -15,7 +15,7 @@ export const MateriSection = ({
   return (
     <div>
       <div className="flex items-center justify-between mb-3 select-none">
-        <h2 className="text-xl font-bold text-ink">Jenis Materi</h2>
+        <h2 className="text-xl font-black text-ink">Jenis Materi</h2>
         <span className="text-xs font-bold text-gray-500">
           3 Modul Utama SKD
         </span>

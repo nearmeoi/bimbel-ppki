@@ -9,7 +9,7 @@ import { useExam } from '../context/ExamContext';
 import { useAuth } from '../context/AuthContext';
 import { useTimer } from '../hooks/useTimer';
 import { useToast } from '../components/ui/Toast';
-import { X, Check } from 'lucide-react';
+import { X, Check, Bookmark } from 'lucide-react';
 
 /**
  * Bimbel Focus Exam Pengerjaan Soal Screen
@@ -148,9 +148,10 @@ export const ExamPage = ({ onNavigate, params }) => {
             <Button
               variant={isCurrentFlagged ? 'accent' : 'secondary'}
               onClick={() => currentQ?.id && toggleFlag(currentQ.id)}
-              className="flex-1 md:flex-none min-w-[130px]"
+              className="flex-1 md:flex-none min-w-[130px] inline-flex items-center justify-center gap-1.5"
             >
-              {isCurrentFlagged ? '★ Ditandai Ragu' : 'Tandai Ragu'}
+              <Bookmark size={15} className={isCurrentFlagged ? 'fill-ink' : ''} />
+              <span>{isCurrentFlagged ? 'Ditandai Ragu' : 'Tandai Ragu'}</span>
             </Button>
             <Button
               variant="primary"

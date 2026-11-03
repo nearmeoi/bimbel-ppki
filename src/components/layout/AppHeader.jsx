@@ -219,7 +219,7 @@ export const AppHeader = ({
               className="flex items-center gap-3 px-4 py-3 rounded-2xl font-black text-sm text-left bg-accent text-ink border-2 border-black shadow-neo-sm min-h-[44px]"
             >
               <ShieldCheck size={18} />
-              <span>🛡️ Buka Panel Admin</span>
+              <span>Buka Panel Admin</span>
             </button>
           )}
           <div className="border-t border-white/20 pt-3 mt-2 flex justify-between items-center px-2">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles, ShieldCheck } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 
 /**
@@ -64,7 +64,7 @@ export const AuthLayout = ({
 
         {/* Bottom Social Proof */}
         <div className="relative z-10 border-t border-white/20 pt-6 flex items-center justify-between text-xs text-blue-100">
-          <span>🛡️ Teruji Sesuai Kisi-Kisi PermenPANRB</span>
+          <span className="inline-flex items-center gap-1.5"><ShieldCheck size={14} className="text-accent flex-shrink-0" /> Teruji Sesuai Kisi-Kisi Resmi BKN</span>
           <span className="font-bold text-white">45.000+ Alumni</span>
         </div>
       </div>

@@ -28,6 +28,10 @@ import {
   Smartphone,
   Award,
   Layers,
+  CheckCircle2,
+  Flame,
+  X,
+  Sparkles,
 } from 'lucide-react';
 
 /**
@@ -202,9 +206,13 @@ export const LandingPage = ({ onNavigate }) => {
             </div>
 
             {/* Trust Line */}
-            <p className="text-xs sm:text-sm text-blue-200 font-semibold pt-1">
-              ✓ Gratis daftar · Tanpa kartu kredit · Akses langsung ke 1 paket try out
-            </p>
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-blue-100 font-semibold pt-1 flex-wrap">
+              <span className="inline-flex items-center gap-1"><CheckCircle2 size={14} className="text-accent flex-shrink-0" /> Gratis daftar</span>
+              <span className="text-white/40">•</span>
+              <span>Tanpa kartu kredit</span>
+              <span className="text-white/40">•</span>
+              <span>Akses langsung 1 paket try out</span>
+            </div>
           </div>
 
           {/* Right Hero: Browser Frame with Mockup & Offset Stacked Cards */}
@@ -288,7 +296,7 @@ export const LandingPage = ({ onNavigate }) => {
                 </p>
                 <div className="mt-2 text-right">
                   <span className="text-[11px] font-black text-primary hover:underline cursor-pointer">
-                    Bahas Soal →
+                    <span className="inline-flex items-center gap-1">Bahas Soal <ArrowRight size={14} /></span>
                   </span>
                 </div>
               </OutlineCard>
@@ -360,7 +368,7 @@ export const LandingPage = ({ onNavigate }) => {
             'PEMBAHASAN DETAIL & CEPAT',
           ].map((text, idx) => (
             <span key={idx} className="font-black text-sm sm:text-base uppercase tracking-widest text-ink flex items-center gap-4">
-              <span>★</span>
+              <Sparkles size={14} className="text-ink" />
               <span>{text}</span>
             </span>
           ))}
@@ -544,9 +552,7 @@ export const LandingPage = ({ onNavigate }) => {
 
               {idx < 2 && (
                 <div className="hidden md:block absolute -right-4 top-1/2 -translate-y-1/2 z-20">
-                  <div className="w-8 h-8 rounded-full border-2 border-black bg-white flex items-center justify-center font-black shadow-neo-sm">
-                    →
-                  </div>
+                  <div className="w-8 h-8 rounded-full border-2 border-black bg-white flex items-center justify-center font-black shadow-neo-sm"><ArrowRight size={16} /></div>
                 </div>
               )}
             </OutlineCard>
@@ -617,12 +623,12 @@ export const LandingPage = ({ onNavigate }) => {
           </div>
 
           <div className="p-3 rounded-xl border border-black bg-accent/20 flex items-center justify-between text-xs font-bold text-ink">
-            <span>🔥 Rata-rata skor peserta Bimbel: <strong>410/550</strong> (Di atas standar passing grade BKN)</span>
+            <div className="inline-flex items-center gap-1.5"><Flame size={15} className="text-orange-500 fill-orange-500 flex-shrink-0" /> <span>Rata-rata skor peserta Bimbel: <strong>410/550</strong> (Di atas standar passing grade BKN)</span></div>
             <button
               onClick={() => onNavigate && onNavigate('/rangking')}
               className="text-primary font-black hover:underline"
             >
-              Cek Leaderboard Lengkap →
+              <span className="inline-flex items-center gap-1">Cek Leaderboard Lengkap <ArrowRight size={13} /></span>
             </button>
           </div>
         </div>
@@ -664,7 +670,7 @@ export const LandingPage = ({ onNavigate }) => {
               }`}
             >
               <span>Sekali Bayar (Hemat 50%)</span>
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+              
             </button>
           </div>
         </div>
@@ -696,7 +702,7 @@ export const LandingPage = ({ onNavigate }) => {
                   <span>Kunci Jawaban Singkat</span>
                 </li>
                 <li className="flex items-center gap-2 text-gray-400">
-                  <span>✕ Tanpa analisis kelemahan mendalam</span>
+                  <span className="inline-flex items-center gap-1.5"><X size={14} className="text-gray-400 flex-shrink-0" /> Tanpa evaluasi kelemahan sub-materi</span>
                 </li>
               </ul>
             </div>
@@ -759,7 +765,7 @@ export const LandingPage = ({ onNavigate }) => {
           >
             {/* Top Recommended Yellow Strip */}
             <div className="absolute top-0 left-0 right-0 bg-accent border-b-2 border-black py-1.5 text-center font-black text-xs uppercase tracking-wider text-ink shadow-sm">
-              ★ PALING POPULER & DIREKOMENDASIKAN ★
+              <span className="inline-flex items-center gap-1.5"><Sparkles size={13} /> Paling Populer & Direkomendasikan</span>
             </div>
 
             <div className="pt-5">
@@ -1106,12 +1112,6 @@ export const LandingPage = ({ onNavigate }) => {
               className="hover:underline"
             >
               Masuk Siswa
-            </button>
-            <button
-              onClick={() => onNavigate && onNavigate('/komponen')}
-              className="hover:underline text-gray-500"
-            >
-              Showcase Komponen
             </button>
             <button
               onClick={() => onNavigate && onNavigate('/admin/dashboard')}

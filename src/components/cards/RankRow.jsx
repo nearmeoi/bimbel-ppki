@@ -18,7 +18,7 @@ export const RankRow = ({
   tkp = 150,
   totalScore = 410,
   isCurrentUser = false,
-  deltaText = '▲ 3 minggu ini',
+  deltaText = '3 minggu ini',
   variant = 'compact',
   className = '',
 }) => {
@@ -47,8 +47,9 @@ export const RankRow = ({
               {name} {isCurrentUser && <span className="text-primary font-bold">(Anda)</span>}
             </span>
             {isCurrentUser && deltaText && (
-              <span className="block text-[11px] font-bold text-emerald-700">
-                {deltaText}
+              <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-700">
+                <ArrowUp size={11} className="stroke-[3]" />
+                <span>{deltaText.replace(/^[▲\s]+/, '')}</span>
               </span>
             )}
           </div>
@@ -103,9 +104,10 @@ export const RankRow = ({
             <span className={`text-[14px] truncate leading-tight ${isCurrentUser ? 'font-black text-ink' : 'font-bold text-ink'}`}>
               {isCurrentUser ? `Peringkat kamu: #${rank || 42}` : name}
             </span>
-            {isCurrentUser && (
-              <span className="inline-flex items-center gap-0.5 rounded-full border border-black bg-white px-1.5 py-0.2 text-[11px] font-black text-emerald-700 shadow-neo-sm">
-                {deltaText}
+            {isCurrentUser && deltaText && (
+              <span className="inline-flex items-center gap-0.5 rounded-full border border-black bg-white px-2 py-0.5 text-[11px] font-black text-emerald-700 shadow-neo-sm">
+                <ArrowUp size={11} className="stroke-[3]" />
+                <span>{deltaText.replace(/^[▲\s]+/, '')}</span>
               </span>
             )}
           </div>

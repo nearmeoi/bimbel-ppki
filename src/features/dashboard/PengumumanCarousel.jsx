@@ -46,7 +46,7 @@ export const PengumumanCarousel = ({ pengumuman = [], onSelectAnnouncement }) =>
               </h3>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-black bg-accent text-xs font-black text-ink shadow-neo-sm">
                 <Clock className="w-3.5 h-3.5" />
-                3 hari lagi
+                {current.countdown || 'Agenda Nasional'}
               </span>
             </div>
 
@@ -91,8 +91,8 @@ export const PengumumanCarousel = ({ pengumuman = [], onSelectAnnouncement }) =>
           </div>
 
           {/* Description & Pagination row (Dots + 1/3) */}
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100 text-xs">
-            <span className="text-gray-600 font-medium line-clamp-1 max-w-md">
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100 text-xs gap-4">
+            <span className="text-gray-600 font-medium line-clamp-2 max-w-xl">
               {current.description}
             </span>
 

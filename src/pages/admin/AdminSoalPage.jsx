@@ -7,7 +7,7 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
 import { Tabs } from '../../components/ui/Tabs';
-import { Plus, Search, Trash2, Edit2, Eye, RefreshCw, RotateCcw } from 'lucide-react';
+import { Plus, Search, Trash2, Edit2, Eye, RefreshCw, RotateCcw, Check } from 'lucide-react';
 import defaultQuestions from '../../data/soal.json';
 import { useToast } from '../../components/ui/Toast';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
@@ -501,7 +501,7 @@ export const AdminSoalPage = ({ onNavigate }) => {
                     }`}
                   >
                     <div className="w-4 h-4 rounded-full border border-black flex items-center justify-center text-[10px]">
-                      {Number(formCorrect) === i ? '✓' : ''}
+                      {Number(formCorrect) === i ? <Check size={11} strokeWidth={3} /> : ''}
                     </div>
                     <span>{opt}</span>
                   </div>
