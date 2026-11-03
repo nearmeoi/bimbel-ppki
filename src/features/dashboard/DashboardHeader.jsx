@@ -28,7 +28,7 @@ export const DashboardHeader = ({
         <div>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-black bg-accent/40 text-xs font-black uppercase text-ink shadow-neo-sm mb-2">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            Persiapan SKD CPNS 2024/2025
+            Persiapan SKD CPNS 2026
           </span>
           <h1 className="text-[28px] sm:text-[34px] lg:text-[38px] font-black text-ink leading-tight select-none">
             Selamat Datang, {userName}!

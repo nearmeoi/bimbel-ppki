@@ -1,13 +1,11 @@
 import React from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
-import AssetPlaceholder from '../ui/AssetPlaceholder';
+import { ArrowRight, Sparkles, Brain } from 'lucide-react';
 
 /**
  * Bimbel Signature Gradient Insight Card Component
  * Conforms to revisions:
  * - Gradient darkened to #6D7CF5 -> #4A5CE8 for WCAG AA text contrast
  * - CTA button: "Latihan TKP Sekarang"
- * - Clear sticker/mascot asset slot (ASET: Sticker Insight 1:1)
  * - Neo-brutalist border-2 border-black & shadow-neo
  */
 export const InsightCard = ({
@@ -48,19 +46,25 @@ export const InsightCard = ({
               onClick={onAction}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-black bg-accent text-ink text-xs md:text-sm font-black shadow-neo-sm hover:shadow-neo hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all focus-visible:ring-3 focus-visible:ring-accent min-h-[44px] cursor-pointer"
             >
-              <span>Latihan TKP Sekarang</span>
+              <span>Tingkatkan Kemampuan Sekarang</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Clear Sticker / Mascot Slot */}
+        {/* AI Insight Vector Badge */}
         <div className="flex-shrink-0 self-center sm:self-start">
-          <AssetPlaceholder
-            label="ASET: Sticker Insight 1:1"
-            aspect="1:1"
-            className="w-24 h-24 sm:w-28 sm:h-28 bg-white/90 shadow-neo-sm"
-          />
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 border-black bg-accent p-2.5 text-ink shadow-neo flex flex-col items-center justify-center select-none rotate-2">
+            <div className="w-10 h-10 rounded-full border-2 border-black bg-white flex items-center justify-center shadow-neo-sm mb-1.5">
+              <Brain className="w-5 h-5 text-primary" />
+            </div>
+            <div className="text-[10px] font-black uppercase tracking-wider text-center leading-tight">
+              AI PREDIKSI
+            </div>
+            <div className="text-[9px] font-bold text-gray-700 text-center">
+              Akurasi 98%
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { FocusLayout } from '../components/layout/FocusLayout';
 import { OutlineCard } from '../components/cards/OutlineCard';
 import { Button } from '../components/ui/Button';
@@ -14,13 +15,19 @@ import { X, Check } from 'lucide-react';
  * Bimbel Focus Exam Pengerjaan Soal Screen
  * @param {Object} props
  * @param {Function} props.onNavigate
+ * @param {Object} props.params
  */
-export const ExamPage = ({ onNavigate }) => {
+export const ExamPage = ({ onNavigate, params }) => {
   const toast = useToast();
+  const urlParams = useParams();
+  const setId = params?.id || urlParams?.id || 1;
+
   const {
     questions,
     currentQuestionIndex,
     currentQuestion,
+    activeSetTitle,
+    loadQuestionsForSet,
     answers,
     flagged,
     selectAnswer,
@@ -34,6 +41,13 @@ export const ExamPage = ({ onNavigate }) => {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [mobileGridOpen, setMobileGridOpen] = useState(false);
 
+  // [BACKEND-DYNAMIC]: Butir soal ujian dimuat dinamis dari public.soal where set_id = :setId
+  useEffect(() => {
+    if (setId) {
+      loadQuestionsForSet(setId);
+    }
+  }, [setId]);
+
   // 45 minute countdown timer
   const { formattedTime, isWarning } = useTimer({
     initialSeconds: 2700,
@@ -44,14 +58,16 @@ export const ExamPage = ({ onNavigate }) => {
   });
 
   const { user } = useAuth();
-  const selectedOption = answers[currentQuestion.id];
-  const isCurrentFlagged = Boolean(flagged[currentQuestion.id]);
+  const currentQ = currentQuestion || questions[0] || {};
+  const selectedOption = currentQ?.id ? answers[currentQ.id] : undefined;
+  const isCurrentFlagged = currentQ?.id ? Boolean(flagged[currentQ.id]) : false;
 
+  // [BACKEND-DYNAMIC]: Simpan pengerjaan ujian siswa ke tabel public.exam_attempts (user_id, set_id, answers, flagged, twk_score, tiu_score, tkp_score, total_score, is_lulus)
   const handleConfirmSubmit = async () => {
     setConfirmModalOpen(false);
-    await submitExam(user?.id, 1);
+    await submitExam(user?.id, Number(setId) || 1);
     toast.success('Ujian berhasil dikumpulkan!');
-    if (onNavigate) onNavigate('/hasil/1');
+    if (onNavigate) onNavigate(`/hasil/${setId || 1}`);
   };
 
   const answeredCount = Object.keys(answers).length;
@@ -59,7 +75,7 @@ export const ExamPage = ({ onNavigate }) => {
 
   return (
     <FocusLayout
-      title="Simulasi SKD Campuran Set 1"
+      title={activeSetTitle || `Simulasi SKD Set ${setId}`}
       formattedTime={formattedTime}
       isTimeWarning={isWarning}
       onFinishExam={() => setConfirmModalOpen(true)}
@@ -70,8 +86,8 @@ export const ExamPage = ({ onNavigate }) => {
           <OutlineCard className="space-y-6">
             {/* Question Header */}
             <div className="flex justify-between items-center pb-2 border-b-2 border-gray-100">
-              <Badge variant={currentQuestion.subject.toLowerCase()}>
-                {currentQuestion.subject} - {currentQuestion.topic}
+              <Badge variant={(currentQ?.subject || 'twk').toLowerCase()}>
+                {currentQ?.subject || 'TWK'} - {currentQ?.topic || 'Umum'}
               </Badge>
               <span className="font-extrabold text-sm text-gray-500">
                 Soal No. {currentQuestionIndex + 1} dari {questions.length}
@@ -80,17 +96,17 @@ export const ExamPage = ({ onNavigate }) => {
 
             {/* Question Statement */}
             <p className="text-lg md:text-xl font-bold text-ink leading-relaxed">
-              {currentQuestion.question}
+              {currentQ?.question || 'Memuat butir pertanyaan...'}
             </p>
 
             {/* Answer Options */}
             <div className="space-y-3">
-              {currentQuestion.options.map((opt, idx) => {
+              {(currentQ?.options || []).map((opt, idx) => {
                 const isSelected = selectedOption === idx;
                 return (
                   <div
                     key={idx}
-                    onClick={() => selectAnswer(currentQuestion.id, idx)}
+                    onClick={() => selectAnswer(currentQ.id, idx)}
                     className={`
                       border-2 rounded-xl p-4 cursor-pointer transition-all duration-150 font-medium flex items-center gap-3.5 select-none
                       ${
@@ -131,14 +147,14 @@ export const ExamPage = ({ onNavigate }) => {
             </Button>
             <Button
               variant={isCurrentFlagged ? 'accent' : 'secondary'}
-              onClick={() => toggleFlag(currentQuestion.id)}
+              onClick={() => currentQ?.id && toggleFlag(currentQ.id)}
               className="flex-1 md:flex-none min-w-[130px]"
             >
               {isCurrentFlagged ? '★ Ditandai Ragu' : 'Tandai Ragu'}
             </Button>
             <Button
               variant="primary"
-              disabled={currentQuestionIndex === questions.length - 1}
+              disabled={currentQuestionIndex >= questions.length - 1}
               onClick={nextQuestion}
               className="flex-1 md:flex-none min-w-[120px]"
             >

@@ -233,6 +233,9 @@ export const AdminSoalPage = ({ onNavigate }) => {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('Apakah Anda yakin ingin menghapus butir soal ini secara permanen dari sistem?')) {
+      return;
+    }
     if (isSupabaseConfigured) {
       try {
         await supabase.from('soal').delete().eq('id', id);

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { PageShell } from '../components/layout/PageShell';
 import { OutlineCard } from '../components/cards/OutlineCard';
 import { Badge } from '../components/ui/Badge';
@@ -11,9 +12,13 @@ import defaultQuestions from '../data/soal.json';
  * Bimbel Review Kunci & Pembahasan Soal Screen
  * @param {Object} props
  * @param {Function} props.onNavigate
+ * @param {Object} props.params
  */
-export const PembahasanPage = ({ onNavigate }) => {
-  const { questions = defaultQuestions, answers } = useExam();
+export const PembahasanPage = ({ onNavigate, params }) => {
+  const urlParams = useParams();
+  const setId = params?.id || urlParams?.id || 1;
+  // [BACKEND-DYNAMIC]: Pembahasan dan butir soal dimuat dari public.soal where set_id = :setId
+  const { questions = defaultQuestions, answers = {} } = useExam();
   const [filter, setFilter] = useState('Semua');
 
   const getQuestionStatus = (q) => {
@@ -23,7 +28,7 @@ export const PembahasanPage = ({ onNavigate }) => {
     return userAns === q.correctAnswer ? 'benar' : 'salah';
   };
 
-  const filteredQuestions = questions.filter((q) => {
+  const filteredQuestions = (questions || defaultQuestions).filter((q) => {
     if (filter === 'Semua') return true;
     return getQuestionStatus(q) === filter.toLowerCase();
   });
@@ -34,7 +39,7 @@ export const PembahasanPage = ({ onNavigate }) => {
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <button
-            onClick={() => onNavigate && onNavigate('/hasil/1')}
+            onClick={() => onNavigate && onNavigate(`/hasil/${setId}`)}
             className="flex items-center gap-2 font-bold text-ink mb-2 hover:underline cursor-pointer group"
           >
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Kembali ke Ringkasan Nilai
@@ -70,7 +75,7 @@ export const PembahasanPage = ({ onNavigate }) => {
               {/* Question Header */}
               <div className="flex justify-between items-center pb-2 border-b-2 border-gray-100">
                 <div className="flex items-center gap-2">
-                  <Badge variant={q.subject.toLowerCase()}>{q.subject}</Badge>
+                  <Badge variant={(q.subject || 'twk').toLowerCase()}>{q.subject}</Badge>
                   <span className="font-extrabold text-sm text-ink">
                     Soal No. {idx + 1}
                   </span>
@@ -95,7 +100,7 @@ export const PembahasanPage = ({ onNavigate }) => {
 
               {/* Options List */}
               <div className="space-y-2">
-                {q.options.map((opt, optIdx) => {
+                {(q.options || []).map((opt, optIdx) => {
                   const isUserChoice = userAns === optIdx;
                   const isKey = q.correctAnswer === optIdx;
 

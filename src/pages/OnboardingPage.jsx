@@ -27,6 +27,7 @@ export const OnboardingPage = ({ onNavigate }) => {
     'Mahkamah Agung RI',
   ];
 
+  // [BACKEND-DYNAMIC]: Simpan pilihan target_instansi dan target_score ke tabel public.profiles where id = auth.uid()
   const handleFinish = async () => {
     await updateProfile({
       targetInstansi: selectedInstansi,

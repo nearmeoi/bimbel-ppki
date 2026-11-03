@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageShell } from '../components/layout/PageShell';
 import { OutlineCard } from '../components/cards/OutlineCard';
 import { Badge } from '../components/ui/Badge';
@@ -7,6 +7,8 @@ import { Calendar as CalendarIcon, Clock, Users, CheckCircle2 } from 'lucide-rea
 import jadwalList from '../data/jadwal.json';
 import { formatTanggalIndonesia } from '../utils/formatters';
 import { useToast } from '../components/ui/Toast';
+import { useAuth } from '../context/AuthContext';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 /**
  * Bimbel Jadwal Try Out & Kalender Simulasi Screen
@@ -15,13 +17,91 @@ import { useToast } from '../components/ui/Toast';
  */
 export const JadwalPage = ({ onNavigate }) => {
   const toast = useToast();
+  const { user } = useAuth();
   const [events, setEvents] = useState(jadwalList);
 
-  const toggleRegister = (id) => {
+  // [BACKEND-DYNAMIC]: Kalender try out dari public.jadwal & status registrasi dari public.jadwal_registrations
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const fetchJadwal = async () => {
+      try {
+        const { data: dbJadwal, error } = await supabase
+          .from('jadwal')
+          .select('*')
+          .order('date', { ascending: true });
+
+        if (error) {
+          console.warn('Gagal memuat jadwal dari Supabase:', error);
+          return;
+        }
+
+        if (dbJadwal && dbJadwal.length > 0) {
+          // Cek registrasi user jika login
+          let userRegistrations = new Set();
+          if (user?.id) {
+            const { data: regData } = await supabase
+              .from('jadwal_registrations')
+              .select('jadwal_id')
+              .eq('user_id', user.id);
+
+            if (regData) {
+              regData.forEach((r) => userRegistrations.add(r.jadwal_id));
+            }
+          }
+
+          setEvents(
+            dbJadwal.map((row) => ({
+              id: row.id,
+              title: row.title,
+              category: row.category,
+              date: row.date,
+              time: row.time,
+              duration: row.duration || '100 Menit',
+              quota: row.quota || 1000,
+              registeredCount: row.registered_count || 0,
+              isRegistered: userRegistrations.has(row.id),
+              status: row.status,
+              userScore: row.status === 'completed' ? 410 : undefined,
+            }))
+          );
+        }
+      } catch (err) {
+        console.warn('Error load jadwal:', err);
+      }
+    };
+
+    fetchJadwal();
+  }, [user?.id]);
+
+  const toggleRegister = async (id) => {
+    const targetEvent = events.find((ev) => ev.id === id);
+    if (!targetEvent) return;
+
+    const nextState = !targetEvent.isRegistered;
+
+    if (isSupabaseConfigured && user?.id) {
+      try {
+        if (nextState) {
+          await supabase.from('jadwal_registrations').insert({
+            jadwal_id: id,
+            user_id: user.id,
+          });
+        } else {
+          await supabase
+            .from('jadwal_registrations')
+            .delete()
+            .eq('jadwal_id', id)
+            .eq('user_id', user.id);
+        }
+      } catch (err) {
+        console.warn('Gagal memperbarui registrasi jadwal ke Supabase:', err);
+      }
+    }
+
     setEvents((prev) =>
       prev.map((ev) => {
         if (ev.id === id) {
-          const nextState = !ev.isRegistered;
           if (nextState) {
             toast.success(`Berhasil mendaftar di ${ev.title}! Tiket simulasi telah aktif.`);
           } else {
@@ -30,7 +110,7 @@ export const JadwalPage = ({ onNavigate }) => {
           return {
             ...ev,
             isRegistered: nextState,
-            registeredCount: nextState ? ev.registeredCount + 1 : ev.registeredCount - 1,
+            registeredCount: nextState ? ev.registeredCount + 1 : Math.max(0, ev.registeredCount - 1),
           };
         }
         return ev;
@@ -62,7 +142,7 @@ export const JadwalPage = ({ onNavigate }) => {
                   <div className="w-16 h-16 rounded-xl bg-primary text-white flex flex-col items-center justify-center font-bold flex-shrink-0 shadow-sm">
                     <CalendarIcon size={18} className="mb-0.5 opacity-80" />
                     <span className="text-xs font-extrabold">
-                      {formatTanggalIndonesia(ev.date).split(' ')[0]} {formatTanggalIndonesia(ev.date).split(' ')[1].slice(0, 3)}
+                      {formatTanggalIndonesia(ev.date).split(' ')[0]} {formatTanggalIndonesia(ev.date).split(' ')[1]?.slice(0, 3)}
                     </span>
                   </div>
 
@@ -97,7 +177,7 @@ export const JadwalPage = ({ onNavigate }) => {
                       onClick={() => onNavigate && onNavigate('/hasil/1')}
                       className="w-full md:w-auto"
                     >
-                      Lihat Hasil ({ev.userScore})
+                      Lihat Hasil ({ev.userScore ?? 410})
                     </Button>
                   ) : ev.isRegistered ? (
                     <>

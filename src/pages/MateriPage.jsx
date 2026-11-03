@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageShell } from '../components/layout/PageShell';
 import { OutlineCard } from '../components/cards/OutlineCard';
 import { Badge } from '../components/ui/Badge';
@@ -8,6 +8,7 @@ import { ProgressBar } from '../components/ui/ProgressBar';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Search } from 'lucide-react';
 import materiList from '../data/materi.json';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 /**
  * Bimbel Materi Belajar Catalog Page
@@ -17,6 +18,47 @@ import materiList from '../data/materi.json';
 export const MateriPage = ({ onNavigate }) => {
   const [filter, setFilter] = useState('Semua');
   const [searchQuery, setSearchQuery] = useState('');
+  const [materis, setMateris] = useState(materiList);
+
+  // [BACKEND-DYNAMIC]: Silabus modul pembelajaran dimuat dari tabel public.materi
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const fetchMateri = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('materi')
+          .select('*')
+          .order('order_num', { ascending: true });
+
+        if (error) {
+          console.warn('Gagal memuat materi dari Supabase:', error);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          setMateris(
+            data.map((row) => ({
+              id: row.id,
+              type: row.type,
+              title: row.title,
+              summary: row.summary,
+              progress: 0,
+              status: 'Belum Selesai',
+              time: row.estimated_time || '45 Menit',
+              keyPoints: Array.isArray(row.key_points)
+                ? row.key_points
+                : JSON.parse(row.key_points || '[]'),
+            }))
+          );
+        }
+      } catch (err) {
+        console.warn('Error load materi:', err);
+      }
+    };
+
+    fetchMateri();
+  }, []);
 
   const filterTabs = [
     { id: 'Semua', label: 'Semua' },
@@ -25,11 +67,11 @@ export const MateriPage = ({ onNavigate }) => {
     { id: 'TKP', label: 'TKP' },
   ];
 
-  const filteredMateri = materiList.filter((m) => {
+  const filteredMateri = materis.filter((m) => {
     const matchesFilter = filter === 'Semua' || m.type === filter;
     const matchesSearch =
-      m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.summary.toLowerCase().includes(searchQuery.toLowerCase());
+      (m.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (m.summary || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -72,13 +114,13 @@ export const MateriPage = ({ onNavigate }) => {
               >
                 <div>
                   <div className="flex justify-between items-start mb-4">
-                    <Badge variant={sub.type.toLowerCase()}>{sub.type}</Badge>
+                    <Badge variant={(sub.type || 'twk').toLowerCase()}>{sub.type}</Badge>
                     <span
                       className={`text-xs font-bold ${
                         sub.progress === 100 ? 'text-green-600' : 'text-gray-500'
                       }`}
                     >
-                      {sub.status}
+                      {sub.status || 'Tersedia'}
                     </span>
                   </div>
                   <h3 className="text-xl font-bold mb-2 text-ink group-hover:text-primary transition-colors leading-snug">
@@ -91,7 +133,7 @@ export const MateriPage = ({ onNavigate }) => {
 
                 <div className="pt-2">
                   <ProgressBar
-                    value={sub.progress}
+                    value={sub.progress || 0}
                     label="Progres Pembelajaran"
                     showLabel
                     color={sub.progress === 100 ? 'green' : 'primary'}

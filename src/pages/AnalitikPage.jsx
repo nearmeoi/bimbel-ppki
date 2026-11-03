@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageShell } from '../components/layout/PageShell';
 import { OutlineCard } from '../components/cards/OutlineCard';
 import { Badge } from '../components/ui/Badge';
@@ -16,8 +16,9 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import { AlertCircle, Target, Award, TrendingUp } from 'lucide-react';
+import { AlertCircle, Target, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 /**
  * Bimbel Analitik Nilai & Diagnosa Kelemahan Screen
@@ -26,8 +27,70 @@ import { useAuth } from '../context/AuthContext';
  */
 export const AnalitikPage = ({ onNavigate }) => {
   const { user } = useAuth();
-  const { summary, scoreHistory, subjectPerformance, weakTopics } = analitikData;
+  const [summary, setSummary] = useState(analitikData.summary);
+  const [scoreHistory, setScoreHistory] = useState(analitikData.scoreHistory);
+  const [subjectPerformance, setSubjectPerformance] = useState(analitikData.subjectPerformance);
+  const [weakTopics] = useState(analitikData.weakTopics);
+
   const userTargetScore = user?.targetScore || summary.targetScore || 450;
+
+  // [BACKEND-DYNAMIC]: Riwayat skor, statistik kelulusan, dan grafik tren dihitung dari public.exam_attempts where user_id = auth.uid()
+  useEffect(() => {
+    if (!isSupabaseConfigured || !user?.id) return;
+
+    const fetchUserAnalytics = async () => {
+      try {
+        const { data: attempts, error } = await supabase
+          .from('exam_attempts')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('submitted_at', { ascending: true });
+
+        if (error) {
+          console.warn('Gagal memuat analitik dari Supabase:', error);
+          return;
+        }
+
+        if (attempts && attempts.length > 0) {
+          const totalScores = attempts.map((a) => a.total_score || 0);
+          const avgScore = Math.round(
+            totalScores.reduce((sum, s) => sum + s, 0) / attempts.length
+          );
+          const maxScore = Math.max(...totalScores);
+          const lulusCount = attempts.filter((a) => a.is_lulus).length;
+          const passingRate = `${Math.round((lulusCount / attempts.length) * 100)}%`;
+
+          setSummary({
+            averageScore: avgScore,
+            targetScore: userTargetScore,
+            highestScore: maxScore,
+            passingRate,
+          });
+
+          // History line chart data
+          setScoreHistory(
+            attempts.map((a, idx) => ({
+              batch: `Try Out #${idx + 1}`,
+              Total: a.total_score,
+              passingGrade: 311,
+            }))
+          );
+
+          // Subject comparison from latest attempt
+          const latest = attempts[attempts.length - 1];
+          setSubjectPerformance([
+            { subject: 'TWK', user: latest.twk_score || 0, passingGrade: 65 },
+            { subject: 'TIU', user: latest.tiu_score || 0, passingGrade: 80 },
+            { subject: 'TKP', user: latest.tkp_score || 0, passingGrade: 166 },
+          ]);
+        }
+      } catch (err) {
+        console.warn('Error load analytics:', err);
+      }
+    };
+
+    fetchUserAnalytics();
+  }, [user?.id, userTargetScore]);
 
   return (
     <PageShell currentPath="/analitik" onNavigate={onNavigate} user={user}>
@@ -62,7 +125,7 @@ export const AnalitikPage = ({ onNavigate }) => {
                 <LineChart data={scoreHistory}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                   <XAxis dataKey="batch" stroke="#374151" fontSize={12} fontStyle="bold" />
-                  <YAxis domain={[250, 480]} stroke="#374151" fontSize={12} />
+                  <YAxis domain={[0, 550]} stroke="#374151" fontSize={12} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#FFFFFF',
@@ -145,7 +208,7 @@ export const AnalitikPage = ({ onNavigate }) => {
                     className="border-b border-gray-100 hover:bg-gray-50 text-xs md:text-sm font-medium text-ink"
                   >
                     <td className="p-3.5 font-bold">
-                      <Badge variant={item.subject.toLowerCase()}>{item.subject}</Badge>
+                      <Badge variant={(item.subject || 'twk').toLowerCase()}>{item.subject}</Badge>
                     </td>
                     <td className="p-3.5 font-bold">{item.topic}</td>
                     <td className="p-3.5 text-center font-extrabold text-red-600">

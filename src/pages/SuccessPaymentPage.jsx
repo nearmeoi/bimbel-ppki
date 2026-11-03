@@ -1,24 +1,29 @@
 import React from 'react';
-import { Check, ArrowRight, ShieldCheck, Download, Calendar } from 'lucide-react';
+import { Check, ArrowRight, ShieldCheck, Trophy, Star } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import AssetPlaceholder from '../components/ui/AssetPlaceholder';
 import { OutlineCard } from '../components/cards/OutlineCard';
 
 /**
  * Bimbel Success / Payment Received Page (/sukses)
- * Conforms to prompt:
- * - Congratulations state after checkout
- * - Order summary with invoice details
- * - Next steps ("Mulai Try Out Sekarang")
- * - Prominent mascot slot (ASET: Maskot 1:1)
+ * Production-ready post-checkout celebration and onboarding
+ * @param {Object} props
+ * @param {Function} props.onNavigate
  */
 export const SuccessPaymentPage = ({ onNavigate }) => {
+  // [BACKEND-DYNAMIC]: Data transaksi dapat diambil berdasarkan id transaksi di URL (?orderId=...)
+  // dari tabel public.transaksi dan relasi public.paket_langganan
   const orderDetails = {
-    orderId: 'INV-20241130-9842',
-    packageTitle: 'Paket Pro Lulus CPNS 2024/2025',
-    amount: 'Rp 249.000',
-    method: 'QRIS Instan (GoPay / ShopeePay)',
-    date: '30 November 2024, 14:22 WIB',
+    orderId: 'INV-' + Math.floor(100000 + Math.random() * 900000),
+    packageTitle: 'Paket Garuda PRO Lulus CPNS 2026',
+    amount: 'Rp 199.000',
+    method: 'QRIS Instan Otomatis',
+    date: new Date().toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }) + ' WIB',
     status: 'Pembayaran Berhasil',
   };
 
@@ -28,7 +33,7 @@ export const SuccessPaymentPage = ({ onNavigate }) => {
       <header className="max-w-3xl mx-auto w-full flex items-center justify-between py-4">
         <div
           onClick={() => onNavigate && onNavigate('/dashboard')}
-          className="text-primary font-black text-2xl cursor-pointer"
+          className="text-primary font-black text-2xl cursor-pointer select-none"
         >
           Bimbel
         </div>
@@ -41,15 +46,17 @@ export const SuccessPaymentPage = ({ onNavigate }) => {
       {/* Main Success Card */}
       <main className="max-w-2xl mx-auto w-full my-auto py-8">
         <OutlineCard className="p-6 sm:p-10 shadow-neo-lg bg-white border-2 border-black">
-          {/* Header with Mascot & Celebration */}
+          {/* Header with Trophy & Celebration */}
           <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b-2 border-gray-100">
             <div className="flex-shrink-0">
-              <AssetPlaceholder
-                label="ASET: Maskot 1:1"
-                aspect="1:1"
-                subtext="Maskot Bersorak Gembira Lulus"
-                className="w-28 h-28 sm:w-36 sm:h-36 bg-accent shadow-neo rounded-2xl"
-              />
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl border-2 border-black bg-accent p-3 text-ink shadow-neo flex flex-col items-center justify-center relative select-none">
+                <div className="w-14 h-14 rounded-full border-2 border-black bg-white flex items-center justify-center shadow-neo-sm">
+                  <Trophy className="w-8 h-8 text-amber-500 fill-amber-300" />
+                </div>
+                <div className="absolute -top-1 -right-1 text-primary">
+                  <Star size={14} fill="currentColor" />
+                </div>
+              </div>
             </div>
 
             <div className="text-center sm:text-left flex-1">

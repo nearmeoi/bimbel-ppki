@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageShell } from '../components/layout/PageShell';
 import { PricingCard } from '../components/cards/PricingCard';
 import paketList from '../data/paket.json';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 /**
  * Bimbel Paket Belajar & Membership Screen
@@ -9,6 +10,47 @@ import paketList from '../data/paket.json';
  * @param {Function} props.onNavigate
  */
 export const PaketPage = ({ onNavigate }) => {
+  // [BACKEND-DYNAMIC]: Sinkronisasi data paket membership aktif & harga promo dari tabel public.paket_langganan
+  const [packages, setPackages] = useState(paketList);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const fetchPackages = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('paket_langganan')
+          .select('*');
+
+        if (error) {
+          console.warn('Gagal memuat paket dari Supabase:', error);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          setPackages(
+            data.map((row) => ({
+              id: row.id,
+              name: row.name,
+              price: row.price,
+              originalPrice: row.original_price,
+              period: row.period,
+              description: row.description,
+              popular: row.popular,
+              features: Array.isArray(row.features)
+                ? row.features
+                : JSON.parse(row.features || '[]'),
+            }))
+          );
+        }
+      } catch (err) {
+        console.warn('Error load packages:', err);
+      }
+    };
+
+    fetchPackages();
+  }, []);
+
   const handleSelectPackage = (paket) => {
     if (onNavigate) {
       onNavigate(`/paket/checkout?id=${paket.id}`);
@@ -29,7 +71,7 @@ export const PaketPage = ({ onNavigate }) => {
 
         {/* Pricing Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 items-stretch">
-          {paketList.map((p) => (
+          {packages.map((p) => (
             <PricingCard
               key={p.id}
               name={p.name}

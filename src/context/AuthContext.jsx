@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
         email: supabaseUser.email,
         role: profile?.role || 'student',
         targetInstansi: profile?.target_instansi || 'Kemenkumham RI',
-        targetScore: profile?.target_score || 450,
+        targetScore: profile?.target_score ?? 450,
         isPro: profile?.is_pro || false,
         joinedDate: profile?.created_at ? profile.created_at.slice(0, 10) : '2026-01-15',
       };
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Dengarkan perubahan sesi autentikasi Supabase jika dikonfigurasi
+  // Dengarkan perubahan sesi autentikasi Supabase secara terpusat tanpa race condition
   useEffect(() => {
     if (!isSupabaseConfigured) {
       setLoading(false);
@@ -74,14 +74,24 @@ export const AuthProvider = ({ children }) => {
 
     let isMounted = true;
 
-    // Cek sesi aktif saat komponen mount
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    // Supabase onAuthStateChange otomatis memicu INITIAL_SESSION pada inisialisasi awal
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!isMounted) return;
+
       if (session?.user) {
         const profileUser = await fetchUserProfile(session.user);
-        if (profileUser && isMounted) {
-          setUser(profileUser);
-          setIsAuthenticated(true);
+        if (isMounted) {
+          if (profileUser) {
+            setUser(profileUser);
+            setIsAuthenticated(true);
+          }
+          // Jika login via OAuth baru selesai (URL berisi token), bersihkan hash tanpa reload paksa
+          if (window.location.hash && window.location.hash.includes('access_token')) {
+            window.history.replaceState(null, '', window.location.pathname || '/dashboard');
+            if (window.location.pathname === '/' || window.location.pathname === '/masuk') {
+              window.location.href = '/dashboard';
+            }
+          }
         }
       } else if (isMounted) {
         setUser(null);
@@ -93,30 +103,9 @@ export const AuthProvider = ({ children }) => {
           console.warn(e);
         }
       }
-      setLoading(false);
-    });
 
-    // Pasang listener status auth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        const profileUser = await fetchUserProfile(session.user);
-        if (profileUser && isMounted) {
-          setUser(profileUser);
-          setIsAuthenticated(true);
-        }
-        // Jika login via OAuth baru selesai (URL berisi token), otomatis arahkan ke dashboard
-        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && window.location.hash.includes('access_token')) {
-          window.location.replace('/dashboard');
-        }
-      } else if (isMounted) {
-        setUser(null);
-        setIsAuthenticated(false);
-        try {
-          localStorage.removeItem('bimbel_user');
-          localStorage.removeItem('bimbel_auth');
-        } catch (e) {
-          console.warn(e);
-        }
+      if (isMounted) {
+        setLoading(false);
       }
     });
 
@@ -232,10 +221,10 @@ export const AuthProvider = ({ children }) => {
     if (isSupabaseConfigured && user?.id) {
       try {
         const dbFields = {};
-        if (fields.name) dbFields.name = fields.name;
-        if (fields.targetInstansi) dbFields.target_instansi = fields.targetInstansi;
-        if (fields.targetScore) dbFields.target_score = fields.targetScore;
-        if (fields.role) dbFields.role = fields.role;
+        if (fields.name !== undefined) dbFields.name = fields.name;
+        if (fields.targetInstansi !== undefined) dbFields.target_instansi = fields.targetInstansi;
+        if (fields.targetScore !== undefined) dbFields.target_score = Number(fields.targetScore);
+        if (fields.role !== undefined) dbFields.role = fields.role;
         if (fields.isPro !== undefined) dbFields.is_pro = fields.isPro;
 
         await supabase.from('profiles').update(dbFields).eq('id', user.id);
@@ -296,4 +285,3 @@ export const useAuth = () => {
 };
 
 export default AuthContext;
-

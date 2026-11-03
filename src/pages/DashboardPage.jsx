@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageShell } from '../components/layout/PageShell';
 import {
   DashboardHeader,
@@ -13,10 +13,11 @@ import { Skeleton } from '../components/ui/Skeleton';
 import AssetPlaceholder from '../components/ui/AssetPlaceholder';
 import { OutlineCard } from '../components/cards/OutlineCard';
 import { Play, Sparkles, BookOpen, Layers } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 /**
  * Bimbel Dashboard Page
- * Features 3 selectable states (conforming to prompt):
+ * Features 3 states:
  * 1. 'active' - Logged-in student with progress, realistic scores, target widget
  * 2. 'empty' - Brand-new user: friendly mascot placeholder, "Mulai dari Try Out Diagnostik" CTA
  * 3. 'loading' - Loading skeleton state with pixel-faithful placeholders
@@ -24,15 +25,18 @@ import { Play, Sparkles, BookOpen, Layers } from 'lucide-react';
 export const DashboardPage = ({ onNavigate }) => {
   const { user: authUser } = useAuth();
   const toast = useToast();
+  
   const [viewState, setViewState] = useState('active'); // 'active' | 'empty' | 'loading'
+  const [hasManuallyToggledState, setHasManuallyToggledState] = useState(false);
+  const [announcements, setAnnouncements] = useState(dashboardData.pengumuman);
+  const [liveStats, setLiveStats] = useState(dashboardData.stats);
+  const [userExamAttempts, setUserExamAttempts] = useState([]);
 
   const {
     user: mockUser,
-    stats,
     continueLesson,
     passingGrade,
     targetHarian,
-    pengumuman,
     subjects,
     rangkingTop5,
     currentUserRank,
@@ -40,6 +44,98 @@ export const DashboardPage = ({ onNavigate }) => {
   } = dashboardData;
 
   const activeUser = authUser?.name ? authUser : mockUser;
+
+  // [BACKEND-DYNAMIC]: Sinkronisasi live dari Supabase:
+  // - Pengumuman dari public.pengumuman
+  // - Statistik progres & rata-rata skor dari public.exam_attempts where user_id = auth.uid()
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    let isMounted = true;
+
+    const loadDashboardData = async () => {
+      try {
+        // 1. Muat pengumuman terbaru dari database
+        const { data: annData } = await supabase
+          .from('pengumuman')
+          .select('*')
+          .order('id', { ascending: false });
+
+        if (isMounted && annData && annData.length > 0) {
+          setAnnouncements(
+            annData.map((row) => ({
+              id: row.id,
+              badge: row.badge,
+              month: row.event_month,
+              day: row.event_day,
+              title: row.title,
+              time: row.time,
+              description: row.description,
+            }))
+          );
+        }
+
+        // 2. Muat riwayat ujian pengguna jika sudah login
+        if (authUser?.id) {
+          const { data: attempts } = await supabase
+            .from('exam_attempts')
+            .select('*')
+            .eq('user_id', authUser.id)
+            .order('submitted_at', { ascending: false });
+
+          if (isMounted && attempts) {
+            setUserExamAttempts(attempts);
+
+            if (attempts.length > 0) {
+              const totalAnswered = attempts.reduce(
+                (sum, a) => sum + Object.keys(a.answers || {}).length,
+                0
+              );
+              const totalScoreSum = attempts.reduce((sum, a) => sum + (a.total_score || 0), 0);
+              const avgScore = Math.round(totalScoreSum / attempts.length);
+
+              setLiveStats([
+                {
+                  id: 'soal',
+                  value: String(totalAnswered || attempts.length * 30),
+                  label: 'Soal Dikerjakan',
+                },
+                {
+                  id: 'skor',
+                  value: String(avgScore),
+                  label: 'Rata-rata Skor',
+                  sublabel: `terbaru: ${attempts[0].total_score}`,
+                },
+                {
+                  id: 'streak',
+                  value: String(attempts.length),
+                  label: 'Simulasi Selesai',
+                  hasFlame: true,
+                },
+              ]);
+
+              if (!hasManuallyToggledState) {
+                setViewState('active');
+              }
+            } else {
+              // Pengguna baru tanpa riwayat ujian: otomatis tampilkan empty state dengan CTA diagnostik
+              if (!hasManuallyToggledState) {
+                setViewState('empty');
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Gagal memuat data dashboard dari Supabase:', err);
+      }
+    };
+
+    loadDashboardData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authUser?.id]);
 
   const handleSelectAnnouncement = (item) => {
     toast.info(`Membuka pengumuman: ${item.title}`);
@@ -60,50 +156,61 @@ export const DashboardPage = ({ onNavigate }) => {
 
   return (
     <PageShell currentPath="/dashboard" onNavigate={onNavigate} user={activeUser}>
-      {/* Dev / Preview State Switcher Bar */}
-      <div className="mb-6 flex items-center justify-between flex-wrap gap-2 rounded-2xl border-2 border-black bg-white px-4 py-2.5 shadow-neo-sm">
-        <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-primary" />
-          <span className="text-xs font-black uppercase text-ink tracking-wider">
-            Dashboard State Preview:
-          </span>
+      {/* Dev / Preview State Switcher Bar — HANYA TAMPIL PADA LINGKUNGAN PENGEMBANGAN (import.meta.env.DEV) */}
+      {import.meta.env.DEV && (
+        <div className="mb-6 flex items-center justify-between flex-wrap gap-2 rounded-2xl border-2 border-black bg-white px-4 py-2.5 shadow-neo-sm">
+          <div className="flex items-center gap-2">
+            <Layers className="w-4 h-4 text-primary" />
+            <span className="text-xs font-black uppercase text-ink tracking-wider">
+              [DEV PREVIEW] Dashboard State:
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                setViewState('active');
+                setHasManuallyToggledState(true);
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer ${
+                viewState === 'active'
+                  ? 'bg-primary text-white border-black shadow-neo-sm'
+                  : 'bg-surfacelight text-ink border-transparent hover:border-black'
+              }`}
+            >
+              Aktif (Normal)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setViewState('empty');
+                setHasManuallyToggledState(true);
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer ${
+                viewState === 'empty'
+                  ? 'bg-accent text-ink border-black shadow-neo-sm'
+                  : 'bg-surfacelight text-ink border-transparent hover:border-black'
+              }`}
+            >
+              Pengguna Baru (Empty)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setViewState('loading');
+                setHasManuallyToggledState(true);
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer ${
+                viewState === 'loading'
+                  ? 'bg-gray-800 text-white border-black shadow-neo-sm'
+                  : 'bg-surfacelight text-ink border-transparent hover:border-black'
+              }`}
+            >
+              Loading Skeleton
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setViewState('active')}
-            className={`px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer ${
-              viewState === 'active'
-                ? 'bg-primary text-white border-black shadow-neo-sm'
-                : 'bg-surfacelight text-ink border-transparent hover:border-black'
-            }`}
-          >
-            Aktif (Normal)
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewState('empty')}
-            className={`px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer ${
-              viewState === 'empty'
-                ? 'bg-accent text-ink border-black shadow-neo-sm'
-                : 'bg-surfacelight text-ink border-transparent hover:border-black'
-            }`}
-          >
-            Pengguna Baru (Empty)
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewState('loading')}
-            className={`px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer ${
-              viewState === 'loading'
-                ? 'bg-gray-800 text-white border-black shadow-neo-sm'
-                : 'bg-surfacelight text-ink border-transparent hover:border-black'
-            }`}
-          >
-            Loading Skeleton
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* ============================================================== */}
       {/* STATE 1: LOADING SKELETON                                     */}
@@ -159,7 +266,7 @@ export const DashboardPage = ({ onNavigate }) => {
               stats={[
                 { id: 'soal', value: '0', label: 'Soal Dikerjakan' },
                 { id: 'skor', value: '-', label: 'Rata-rata Skor', sublabel: 'belum ada tes' },
-                { id: 'streak', value: '0', label: 'Streak Hari', hasFlame: false },
+                { id: 'streak', value: '0', label: 'Simulasi Selesai', hasFlame: false },
               ]}
               continueLesson={{
                 subject: 'DIAGNOSTIK',
@@ -173,10 +280,10 @@ export const DashboardPage = ({ onNavigate }) => {
               <div className="flex flex-col sm:flex-row items-center gap-6">
                 <div className="flex-shrink-0">
                   <AssetPlaceholder
-                    label="ASET: Maskot 1:1"
+                    label="Maskot Pejuang ASN"
                     aspect="1:1"
-                    subtext="Maskot Sambutan Ramah Calon ASN"
-                    className="w-36 h-36 sm:w-44 sm:h-44 bg-accent/40 shadow-neo"
+                    subtext="Siap Lolos SKD 2026"
+                    className="w-32 h-32 sm:w-36 sm:h-36 bg-accent shadow-neo rounded-3xl"
                   />
                 </div>
 
@@ -186,7 +293,7 @@ export const DashboardPage = ({ onNavigate }) => {
                     Langkah Pertama Kamu
                   </span>
                   <h3 className="text-2xl sm:text-3xl font-black text-ink leading-tight">
-                    Belum ada riwayat belajar
+                    Belum ada riwayat pengerjaan soal
                   </h3>
                   <p className="text-sm font-medium text-gray-700 mt-2 leading-relaxed">
                     Ayo mulai dengan mengikuti <strong>Try Out Diagnostik</strong> untuk mengetahui peta kekuatan materi TWK, TIU, dan TKP kamu saat ini.
@@ -216,7 +323,7 @@ export const DashboardPage = ({ onNavigate }) => {
 
             {/* Announcements */}
             <PengumumanCarousel
-              pengumuman={pengumuman}
+              pengumuman={announcements}
               onSelectAnnouncement={handleSelectAnnouncement}
             />
 
@@ -264,22 +371,22 @@ export const DashboardPage = ({ onNavigate }) => {
       )}
 
       {/* ============================================================== */}
-      {/* STATE 3: ACTIVE LOGGED-IN STUDENT (DEFAULT)                   */}
+      {/* STATE 3: ACTIVE LOGGED-IN STUDENT                             */}
       {/* ============================================================== */}
       {viewState === 'active' && (
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Column (Main Content) */}
           <div className="flex-1 flex flex-col gap-6">
-            {/* Header row: Welcome + Continue action + Realistic Stats */}
+            {/* Header row: Welcome + Continue action + Live/Realistic Stats */}
             <DashboardHeader
               userName={activeUser.name || 'User'}
-              stats={stats}
+              stats={liveStats}
               continueLesson={continueLesson}
             />
 
             {/* Pengumuman Carousel */}
             <PengumumanCarousel
-              pengumuman={pengumuman}
+              pengumuman={announcements}
               onSelectAnnouncement={handleSelectAnnouncement}
             />
 
@@ -291,12 +398,19 @@ export const DashboardPage = ({ onNavigate }) => {
             />
           </div>
 
-          {/* Right Column: Target Harian + Rangking Card (Passing Grade + Top 5 + Pinned #42) + Darkened Insight */}
+          {/* Right Column: Target Harian + Rangking Card + Insight */}
           <LeaderboardSidebar
             topUsers={rangkingTop5}
             passingGrade={passingGrade}
             targetHarian={targetHarian}
-            currentUserRank={currentUserRank}
+            currentUserRank={{
+              ...currentUserRank,
+              name: activeUser.name || 'User',
+              totalScore: userExamAttempts[0]?.total_score || currentUserRank.totalScore,
+              twk: userExamAttempts[0]?.twk_score || currentUserRank.twk,
+              tiu: userExamAttempts[0]?.tiu_score || currentUserRank.tiu,
+              tkp: userExamAttempts[0]?.tkp_score || currentUserRank.tkp,
+            }}
             insight={insight}
             onViewLeaderboard={handleViewLeaderboard}
           />

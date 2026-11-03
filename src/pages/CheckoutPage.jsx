@@ -7,6 +7,8 @@ import { Badge } from '../components/ui/Badge';
 import { Modal } from '../components/ui/Modal';
 import { ArrowLeft, CheckCircle2, QrCode, CreditCard, ShieldCheck } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
+import { useAuth } from '../context/AuthContext';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 /**
  * Bimbel Checkout & Pembayaran Paket Screen
@@ -15,16 +17,20 @@ import { useToast } from '../components/ui/Toast';
  */
 export const CheckoutPage = ({ onNavigate }) => {
   const toast = useToast();
+  const { user } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState('qris');
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  // [BACKEND-DYNAMIC]: Data harga dan paket dapat disinkronkan dari tabel public.paket_langganan berdasarkan id di URL (?id=paket-garuda-pro)
   const basePrice = 199000;
   const adminFee = 2500;
   const totalPrice = basePrice - discount + adminFee;
 
   const handleApplyPromo = () => {
+    // [BACKEND-DYNAMIC]: Validasi kode promo dari tabel public.promo_codes (kode, diskon, masa_berlaku)
     if (promoCode.trim().toUpperCase() === 'ASN2026') {
       setDiscount(30000);
       toast.success('Kode promo ASN2026 berhasil digunakan! Hemat Rp 30.000');
@@ -33,7 +39,26 @@ export const CheckoutPage = ({ onNavigate }) => {
     }
   };
 
-  const handlePay = () => {
+  const handlePay = async () => {
+    setLoading(true);
+    // [BACKEND-DYNAMIC]: Panggil API payment gateway (Midtrans Snap / Xendit QRIS / Tripay)
+    // dan simpan record transaksi ke tabel public.transaksi
+    if (isSupabaseConfigured && user?.id) {
+      try {
+        await supabase.from('transaksi').insert({
+          user_id: user.id,
+          paket_id: 'paket-garuda-pro',
+          amount: totalPrice,
+          payment_method: paymentMethod,
+          promo_code: discount > 0 ? 'ASN2026' : null,
+          status: 'pending',
+        });
+      } catch (err) {
+        console.warn('Gagal mencatat transaksi ke Supabase:', err);
+      }
+    }
+
+    setLoading(false);
     if (onNavigate) {
       onNavigate('/sukses');
     } else {
@@ -142,7 +167,7 @@ export const CheckoutPage = ({ onNavigate }) => {
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="font-extrabold text-ink">Paket Garuda PRO</div>
-                    <div className="text-gray-500 text-xs">Akses 6 Bulan</div>
+                    <div className="text-gray-500 text-xs">Akses 6 Bulan Penuh</div>
                   </div>
                   <div className="font-extrabold text-ink">Rp 199.000</div>
                 </div>
@@ -167,7 +192,13 @@ export const CheckoutPage = ({ onNavigate }) => {
                 </div>
               </div>
 
-              <Button variant="accent" fullWidth onClick={handlePay} className="py-3.5 text-base">
+              <Button
+                variant="accent"
+                fullWidth
+                loading={loading}
+                onClick={handlePay}
+                className="py-3.5 text-base shadow-neo hover:shadow-neo-hover"
+              >
                 Bayar Sekarang
               </Button>
 

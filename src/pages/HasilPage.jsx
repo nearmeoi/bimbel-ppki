@@ -1,21 +1,26 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import { PageShell } from '../components/layout/PageShell';
 import { OutlineCard } from '../components/cards/OutlineCard';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { ArrowLeft, Trophy, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, Trophy } from 'lucide-react';
 import { useExam } from '../context/ExamContext';
 
 /**
  * Bimbel Hasil Ujian & Evaluasi Passing Grade Screen
  * @param {Object} props
  * @param {Function} props.onNavigate
+ * @param {Object} props.params
  */
-export const HasilPage = ({ onNavigate }) => {
-  const { examResult } = useExam();
+export const HasilPage = ({ onNavigate, params }) => {
+  const urlParams = useParams();
+  const setId = params?.id || urlParams?.id || 1;
+  const { examResult, activeSetTitle } = useExam();
 
+  // [BACKEND-DYNAMIC]: Evaluasi kelulusan & skor per modul (TWK, TIU, TKP) dari public.exam_attempts
   // Fallback realistic score if exam was visited directly
-  const totalScore = examResult?.totalScore || 410;
+  const totalScore = examResult?.totalScore ?? 410;
   const isLulus = examResult?.isLulus ?? true;
 
   const subjectsData = [
@@ -62,7 +67,7 @@ export const HasilPage = ({ onNavigate }) => {
             <div className="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none" />
 
             <h2 className="text-2xl md:text-3xl font-extrabold text-ink mb-1">
-              Simulasi SKD Set 1 Selesai!
+              {activeSetTitle || `Simulasi SKD Set ${setId}`} Selesai!
             </h2>
             <p className="text-gray-600 font-medium mb-8 text-sm md:text-base">
               {isLulus
@@ -134,7 +139,7 @@ export const HasilPage = ({ onNavigate }) => {
           <Button
             variant="primary"
             fullWidth
-            onClick={() => onNavigate && onNavigate('/hasil/1/pembahasan')}
+            onClick={() => onNavigate && onNavigate(`/hasil/${setId}/pembahasan`)}
             className="py-4 text-base md:text-lg"
           >
             Lihat Kunci &amp; Pembahasan

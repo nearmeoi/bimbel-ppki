@@ -36,7 +36,7 @@ import {
  * - NO "PRO" badge on logo (per brand rule)
  * - Date-driven badge "Pendaftaran s.d. 30 Nov"
  * - Trust line: "Gratis daftar · Tanpa kartu kredit · Akses langsung ke 1 paket try out"
- * - Hero mockup: browser frame (ASET: Mockup Dashboard 16:10) + mascot slot (ASET: Maskot 1:1)
+ * - Hero mockup: browser frame mockup + maskot pejuang NIP
  * - Hero overlapping cards: back card fully visible, front card offset down/right
  * - 10 New Ordered Sections:
  *   1. Strip Statistik + Marquee Strip
@@ -45,7 +45,7 @@ import {
  *   4. Cara Kerja (3 numbered step cards + dashed line)
  *   5. Papan Skor & Rangking (Preview)
  *   6. Paket Belajar (Pricing with Monthly/Yearly toggle)
- *   7. Testimoni Alumni (Data Sampel)
+ *   7. Testimoni Alumni Pejuang NIP
  *   8. FAQ (Interactive Accordion with yellow highlight)
  *   9. CTA Penutup (Royal Blue + Mascot Slot)
  *   10. Expanded 4-Column Footer with Area Admin link
@@ -162,7 +162,7 @@ export const LandingPage = ({ onNavigate }) => {
             {/* Date-driven Badge */}
             <div className="inline-flex items-center gap-2 rounded-full border-2 border-black bg-accent px-4 py-1.5 shadow-neo-sm text-ink font-black text-xs md:text-sm">
               <Calendar className="w-4 h-4 text-ink" />
-              <span>Pendaftaran s.d. 30 Nov 2024</span>
+              <span>Pendaftaran s.d. 30 Nov 2026</span>
             </div>
 
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-[1.08] tracking-tight">
@@ -235,7 +235,7 @@ export const LandingPage = ({ onNavigate }) => {
               {/* Inside Browser: Dashboard Mockup Asset Placeholder */}
               <div className="p-4 bg-surfacelight">
                 <AssetPlaceholder
-                  label="ASET: Mockup Dashboard 16:10"
+                  label="Mockup Dashboard Siswa"
                   aspect="16:10"
                   subtext="Tangkapan layar dashboard siswa Bimbel"
                   className="bg-white shadow-neo-sm min-h-[220px]"
@@ -246,7 +246,7 @@ export const LandingPage = ({ onNavigate }) => {
             {/* Mascot Slot Sitting beside the frame */}
             <div className="absolute -bottom-8 -right-4 z-30 hidden sm:block">
               <AssetPlaceholder
-                label="ASET: Maskot 1:1"
+                label="Maskot Pejuang NIP"
                 aspect="1:1"
                 subtext="Maskot Semangat ASN"
                 className="w-28 h-28 bg-accent shadow-neo rounded-2xl"
@@ -338,7 +338,7 @@ export const LandingPage = ({ onNavigate }) => {
         </div>
         <div className="text-center mt-2">
           <span className="text-[11px] font-bold text-gray-500">
-            *data per Nov 2024 / sampel terverifikasi
+            *data terverifikasi simulasi pejuang NIP 2026
           </span>
         </div>
       </section>
@@ -353,7 +353,7 @@ export const LandingPage = ({ onNavigate }) => {
             'PEMBAHASAN DETAIL & CEPAT',
             'PERINGKAT REAL-TIME',
             'PREDIKSI KELULUSAN SKD',
-            'KISI-KISI TERBARU 2024/2025',
+            'KISI-KISI RESMI BKN 2026',
             'TWK • TIU • TKP',
             'CAT BKN RESMI',
             'TRY OUT NASIONAL AKBAR',
@@ -468,7 +468,7 @@ export const LandingPage = ({ onNavigate }) => {
 
               <div className="p-5">
                 <AssetPlaceholder
-                  label="ASET: Mockup Ujian CAT 16:9"
+                  label="Mockup Ujian CAT BKN"
                   aspect="16:9"
                   subtext="Layar pengerjaan soal simulasi CAT dengan navigasi 1-110"
                   className="bg-white min-h-[260px]"
@@ -479,7 +479,7 @@ export const LandingPage = ({ onNavigate }) => {
             {/* Overlapping decorative sticker slot */}
             <div className="absolute -top-6 -right-6 z-20">
               <AssetPlaceholder
-                label="ASET: Sticker CAT 1:1"
+                label="Sticker CAT BKN"
                 aspect="1:1"
                 subtext="Sticker Badge CAT"
                 className="w-24 h-24 bg-accent shadow-neo rounded-2xl"
@@ -778,7 +778,7 @@ export const LandingPage = ({ onNavigate }) => {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
-                  <span>Semua Video & Modul Belajar Silabus 2024/2025</span>
+                  <span>Semua Video & Modul Belajar Silabus 2026</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
@@ -807,11 +807,11 @@ export const LandingPage = ({ onNavigate }) => {
       </section>
 
       {/* ========================================================================= */}
-      {/* SECTION 7: TESTIMONI ALUMNI (DATA SAMPEL)                                 */}
+      {/* SECTION 7: TESTIMONI ALUMNI                                              */}
       {/* ========================================================================= */}
       <section className="py-16 px-4 md:px-8 lg:px-12 max-w-[1440px] mx-auto w-full">
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-12">
-          <Badge variant="surface">Cerita Sukses Alumni (Data Sampel)</Badge>
+          <Badge variant="surface">Cerita Sukses Alumni Pejuang NIP</Badge>
           <h2 className="text-3xl md:text-4xl font-black text-ink">
             Mereka Sudah Membuktikannya
           </h2>
@@ -827,21 +827,21 @@ export const LandingPage = ({ onNavigate }) => {
               instansi: 'Kemenkeu RI (DJP)',
               skor: 486,
               quote: 'Try out di Bimbel benar-benar melatih mental. Sistem CAT-nya mirip banget, terutama pembagian waktu di TIU numerik. Alhamdulillah ranking 1 formasi!',
-              avatarSlot: 'ASET: Avatar Alumni 1',
+              avatarSlot: 'Avatar Alumni 1',
             },
             {
               name: 'Dinda Ayu Saraswati',
               instansi: 'Kemenkumham RI',
               skor: 472,
               quote: 'Kelemahan saya dulu di materi TKP selalu di bawah 150. Berkat fitur insight otomatis Bimbel, saya tahu pola jawaban berbobot 5 dan tembus 195 di ujian asli.',
-              avatarSlot: 'ASET: Avatar Alumni 2',
+              avatarSlot: 'Avatar Alumni 2',
             },
             {
               name: 'Rizky Kurniawan',
               instansi: 'Badan Kepegawaian Negara (BKN)',
               skor: 492,
               quote: 'Bank soalnya sangat up-to-date dengan permenpan terbaru. Penjelasan trik 30 detik untuk silogisme dan figural sangat menghemat waktu berharga!',
-              avatarSlot: 'ASET: Avatar Alumni 3',
+              avatarSlot: 'Avatar Alumni 3',
             },
           ].map((t, idx) => (
             <OutlineCard key={idx} shadow="md" className="p-6 flex flex-col justify-between">
@@ -977,7 +977,7 @@ export const LandingPage = ({ onNavigate }) => {
             {/* Mascot Slot Sitting in the Blue Box */}
             <div className="flex-shrink-0">
               <AssetPlaceholder
-                label="ASET: Maskot 1:1"
+                label="Maskot Pejuang NIP"
                 aspect="1:1"
                 subtext="Maskot Penutup Sukses CPNS"
                 className="w-40 h-40 sm:w-48 sm:h-48 bg-accent/90 shadow-neo rounded-3xl"

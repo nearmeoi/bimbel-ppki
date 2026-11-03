@@ -124,7 +124,10 @@ export const AppRoutes = () => {
         <Route path="/profil" element={<ProtectedRoute Component={ProfilPage} />} />
 
         {/* Dev / Component Showcase */}
-        <Route path="/komponen" element={<RouteWrapper Component={ComponentSheetPage} />} />
+        {/* Dev / Component Showcase (Hanya aktif pada mode development) */}
+        {import.meta.env.DEV && (
+          <Route path="/komponen" element={<RouteWrapper Component={ComponentSheetPage} />} />
+        )}
 
         {/* Admin Portal (Admin Role Guard) */}
         <Route path="/admin" element={<AdminRoute Component={AdminDashboardPage} />} />

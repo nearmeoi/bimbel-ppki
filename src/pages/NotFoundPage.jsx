@@ -1,15 +1,13 @@
 import React from 'react';
-import { Home, ArrowLeft } from 'lucide-react';
+import { Home, ArrowLeft, Compass, AlertTriangle } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import AssetPlaceholder from '../components/ui/AssetPlaceholder';
 import { OutlineCard } from '../components/cards/OutlineCard';
 
 /**
  * Bimbel 404 Not Found Page
- * Conforms to prompt:
- * - Themed error page with mascot slot (ASET: Maskot 1:1)
- * - Playful copy ("Halaman tersesat di SKD CPNS")
- * - Buttons back to Dashboard and Home
+ * Production-ready themed error page with neo-brutalist styling
+ * @param {Object} props
+ * @param {Function} props.onNavigate
  */
 export const NotFoundPage = ({ onNavigate }) => {
   return (
@@ -18,7 +16,7 @@ export const NotFoundPage = ({ onNavigate }) => {
       <header className="max-w-4xl mx-auto w-full flex items-center justify-between py-4">
         <div
           onClick={() => onNavigate && onNavigate('/')}
-          className="text-primary font-black text-2xl cursor-pointer"
+          className="text-primary font-black text-2xl cursor-pointer select-none"
         >
           Bimbel
         </div>
@@ -34,16 +32,18 @@ export const NotFoundPage = ({ onNavigate }) => {
       {/* Main Error Box */}
       <main className="max-w-xl mx-auto w-full my-auto text-center py-12">
         <OutlineCard className="p-8 sm:p-12 shadow-neo-lg bg-white border-2 border-black flex flex-col items-center">
-          {/* Mascot Slot */}
-          <AssetPlaceholder
-            label="ASET: Maskot 1:1"
-            aspect="1:1"
-            subtext="Maskot Bingung Tersesat"
-            className="w-36 h-36 sm:w-44 sm:h-44 bg-accent/30 shadow-neo mb-6"
-          />
+          {/* Compass & Question Icon Illustration */}
+          <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-3xl border-2 border-black bg-accent p-4 text-ink shadow-neo flex flex-col items-center justify-center mb-6 relative select-none">
+            <div className="w-16 h-16 rounded-full border-2 border-black bg-white flex items-center justify-center shadow-neo-sm">
+              <Compass className="w-10 h-10 text-primary animate-spin" style={{ animationDuration: '10s' }} />
+            </div>
+            <div className="absolute -top-2 -right-2 px-2.5 py-0.5 rounded-full border border-black bg-red-400 text-white font-black text-[11px] shadow-neo-sm flex items-center gap-1">
+              <AlertTriangle size={12} /> Nyasar
+            </div>
+          </div>
 
           <span className="inline-block px-3 py-1 rounded-full border border-black bg-accent text-xs font-black uppercase tracking-wider mb-2">
-            Error 404
+            Error 404 — Halaman Tidak Ditemukan
           </span>
 
           <h1 className="text-3xl sm:text-4xl font-black text-ink mb-3 leading-tight">

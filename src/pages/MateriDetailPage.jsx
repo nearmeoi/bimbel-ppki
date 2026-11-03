@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { PageShell } from '../components/layout/PageShell';
 import { OutlineCard } from '../components/cards/OutlineCard';
 import { Badge } from '../components/ui/Badge';
@@ -7,25 +8,84 @@ import { Tabs } from '../components/ui/Tabs';
 import { ArrowLeft, Play, BookOpen, Check, MessageSquare, FileText } from 'lucide-react';
 import materiList from '../data/materi.json';
 import { useToast } from '../components/ui/Toast';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 /**
  * Bimbel Detail Materi Screen (Video Player, Summary, Sub-chapters)
  * @param {Object} props
- * @param {string} [props.materiId='twk-2']
+ * @param {string} [props.materiId]
+ * @param {Object} [props.params]
  * @param {Function} props.onNavigate
  */
-export const MateriDetailPage = ({ materiId = 'twk-2', onNavigate }) => {
+export const MateriDetailPage = ({ materiId, params, onNavigate }) => {
   const toast = useToast();
+  const urlParams = useParams();
+  const actualId = params?.id || urlParams?.id || materiId || 'twk-2';
+
   const [activeTab, setActiveTab] = useState('ringkasan');
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const materi =
-    materiList.find((m) => m.id === materiId) || materiList[1]; // fallback to Nasionalisme
+  // Fallback awal dari JSON lokal
+  const fallbackMateri =
+    materiList.find((m) => m.id === actualId) || materiList[1];
+  const [materi, setMateri] = useState(fallbackMateri);
+
+  // [BACKEND-DYNAMIC]: Detail modul materi & sub-bab video dari public.materi & public.materi_chapters
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const fetchMateriDetail = async () => {
+      try {
+        const { data: dbMateri, error } = await supabase
+          .from('materi')
+          .select('*, chapters:materi_chapters(*)')
+          .eq('id', actualId)
+          .maybeSingle();
+
+        if (error) {
+          console.warn('Gagal memuat detail materi:', error);
+          return;
+        }
+
+        if (dbMateri) {
+          const chapters = (dbMateri.chapters || []).sort(
+            (a, b) => (a.order_num || 0) - (b.order_num || 0)
+          );
+
+          setMateri({
+            id: dbMateri.id,
+            type: dbMateri.type,
+            title: dbMateri.title,
+            summary: dbMateri.summary,
+            videoUrl: dbMateri.video_url || fallbackMateri.videoUrl,
+            keyPoints: Array.isArray(dbMateri.key_points)
+              ? dbMateri.key_points
+              : JSON.parse(dbMateri.key_points || '[]'),
+            chapters:
+              chapters.length > 0
+                ? chapters.map((ch, idx) => ({
+                    id: ch.id,
+                    title: ch.title,
+                    type: ch.type,
+                    duration: ch.duration,
+                    completed: false,
+                    active: idx === 0,
+                  }))
+                : fallbackMateri.chapters,
+          });
+        }
+      } catch (err) {
+        console.warn('Error load detail materi:', err);
+      }
+    };
+
+    fetchMateriDetail();
+  }, [actualId]);
 
   const detailTabs = [
     { id: 'ringkasan', label: 'Ringkasan Materi', icon: <FileText size={16} /> },
     { id: 'catatan', label: 'Catatan Saya', icon: <BookOpen size={16} /> },
-    { id: 'diskusi', label: 'Diskusi (12)', icon: <MessageSquare size={16} /> },
+    { id: 'diskusi', label: 'Diskusi Komunitas', icon: <MessageSquare size={16} /> },
   ];
 
   return (
@@ -42,7 +102,7 @@ export const MateriDetailPage = ({ materiId = 'twk-2', onNavigate }) => {
           <h1 className="text-2xl md:text-3xl font-extrabold text-ink">
             {materi.title}
           </h1>
-          <Badge variant={materi.type.toLowerCase()}>{materi.type}</Badge>
+          <Badge variant={(materi.type || 'twk').toLowerCase()}>{materi.type}</Badge>
         </div>
       </div>
 
@@ -58,88 +118,97 @@ export const MateriDetailPage = ({ materiId = 'twk-2', onNavigate }) => {
               }}
               className="bg-black w-full aspect-video rounded-xl flex items-center justify-center text-white relative group cursor-pointer overflow-hidden shadow-inner"
             >
-              <img
-                src={materi.videoUrl || 'https://images.unsplash.com/photo-1544928147-79a2dbc1f389?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}
-                alt={materi.title}
-                className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay group-hover:scale-105 transition-transform duration-300"
-              />
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border-2 border-white group-hover:scale-110 transition-transform z-10 shadow-lg">
-                <Play size={32} className="fill-white ml-1 text-white" />
+              {materi.videoUrl && (
+                <img
+                  src={materi.videoUrl}
+                  alt={materi.title}
+                  className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity"
+                />
+              )}
+
+              <div className="absolute w-16 h-16 rounded-full bg-accent text-ink border-2 border-black flex items-center justify-center shadow-neo group-hover:scale-110 transition-transform">
+                <Play size={24} fill="currentColor" className="ml-1" />
               </div>
-              <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center text-xs font-bold bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/20">
-                <span>Modul Video Interaktif</span>
-                <span>12:40</span>
+
+              <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center text-xs font-bold drop-shadow">
+                <span>Modul Video Pembelajaran Terpadu</span>
+                <span>45:00</span>
               </div>
             </div>
           </OutlineCard>
 
-          {/* Underline Tabs */}
+          {/* Sub-tabs: Ringkasan, Catatan, Diskusi */}
           <Tabs
             items={detailTabs}
             activeTab={activeTab}
             onChange={setActiveTab}
-            variant="underline"
+            variant="default"
           />
 
-          {/* Tab Content Display */}
+          {/* Tab Content */}
           {activeTab === 'ringkasan' && (
-            <div className="bg-white border-2 border-black rounded-neo p-6 md:p-8 space-y-4 shadow-neo-sm">
-              <h2 className="text-xl font-extrabold text-ink">Intisari Modul Pembelajaran</h2>
-              <p className="font-medium text-base text-gray-800 leading-relaxed">
-                {materi.summary}
-              </p>
-              {materi.keyPoints && (
-                <ul className="list-disc pl-5 mt-4 space-y-2 font-medium text-gray-700">
-                  {materi.keyPoints.map((point, idx) => (
-                    <li key={idx}>{point}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <OutlineCard className="space-y-4">
+              <h2 className="font-extrabold text-xl text-ink">Poin-Poin Kunci Kisi-Kisi BKN</h2>
+              <ul className="space-y-2.5">
+                {(materi.keyPoints || []).map((point, idx) => (
+                  <li key={idx} className="flex items-start gap-3 text-sm font-medium text-gray-800">
+                    <span className="w-5 h-5 rounded-full bg-blue-100 text-primary border border-primary flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="pt-4 border-t border-gray-100">
+                <h3 className="font-bold text-sm text-ink mb-1">Rangkuman Naratif</h3>
+                <p className="text-xs md:text-sm text-gray-600 leading-relaxed font-medium">
+                  {materi.summary}
+                </p>
+              </div>
+            </OutlineCard>
           )}
 
           {activeTab === 'catatan' && (
-            <div className="bg-white border-2 border-black rounded-neo p-6 space-y-4 shadow-neo-sm">
-              <h2 className="text-lg font-bold text-ink">Catatan Pribadi</h2>
+            <OutlineCard className="space-y-4">
+              <h2 className="font-extrabold text-lg text-ink">Catatan Pribadi Siswa</h2>
               <textarea
-                placeholder="Tuliskan catatan penting Anda untuk modul ini..."
                 rows={5}
-                className="w-full border-2 border-black rounded-xl p-4 font-medium text-sm focus:ring-3 focus:ring-accent focus:outline-none"
+                placeholder="Tuliskan catatan penting Anda untuk materi ini..."
+                className="w-full border-2 border-black rounded-xl p-3 text-sm font-medium focus:ring-3 focus:ring-accent focus:outline-none"
               />
-              <Button
-                size="sm"
-                variant="primary"
-                onClick={() => toast.success('Catatan berhasil disimpan!')}
-              >
+              <Button variant="primary" size="sm" onClick={() => toast.success('Catatan disimpan!')}>
                 Simpan Catatan
               </Button>
-            </div>
+            </OutlineCard>
           )}
 
           {activeTab === 'diskusi' && (
-            <div className="bg-white border-2 border-black rounded-neo p-6 space-y-4 shadow-neo-sm">
-              <h2 className="text-lg font-bold text-ink">Forum Diskusi Soal</h2>
-              <div className="space-y-3">
-                <div className="p-3 bg-surfacelight rounded-xl border border-black/10">
-                  <div className="flex justify-between items-center text-xs text-gray-500 mb-1">
-                    <span className="font-bold text-ink">Rian Pratama</span>
-                    <span>10 menit yang lalu</span>
-                  </div>
-                  <p className="text-xs md:text-sm font-medium">
-                    Apakah ada trik cepat membedakan soal bela negara vs nasionalisme jika ada opsi yang mirip?
-                  </p>
-                </div>
+            <OutlineCard className="space-y-4">
+              <h2 className="font-extrabold text-lg text-ink">Ruang Diskusi &amp; Tanya Mentor</h2>
+              <p className="text-xs text-gray-600 font-medium">
+                Ada pertanyaan mengenai butir materi ini? Tanyakan langsung ke mentor ASN.
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Tulis tanggapan atau pertanyaan..."
+                  className="flex-1 border-2 border-black rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent"
+                />
+                <Button variant="primary" onClick={() => toast.success('Pertanyaan terkirim!')}>
+                  Kirim
+                </Button>
               </div>
-            </div>
+            </OutlineCard>
           )}
         </div>
 
-        {/* Sidebar: Chapter List */}
+        {/* Sidebar: Chapters & Next Step */}
         <div className="flex-1">
-          <OutlineCard className="sticky top-24 space-y-6">
-            <h3 className="font-extrabold text-xl text-ink">Daftar Bab</h3>
+          <OutlineCard className="space-y-4 sticky top-24">
+            <h3 className="font-extrabold text-xl text-ink">Daftar Bab Pembelajaran</h3>
             <div className="space-y-2.5">
-              {materi.chapters.map((ch, idx) => (
+              {(materi.chapters || []).map((ch) => (
                 <div
                   key={ch.id}
                   onClick={() => toast.info(`Membuka bab: ${ch.title}`)}
@@ -162,7 +231,7 @@ export const MateriDetailPage = ({ materiId = 'twk-2', onNavigate }) => {
                   <div>
                     <div className="font-bold text-sm text-ink leading-snug">{ch.title}</div>
                     <div className="text-xs text-gray-500 font-medium mt-0.5">
-                      {ch.type === 'video' ? `Video • ${ch.duration}` : ch.duration}
+                      {ch.type === 'video' ? `Video • ${ch.duration || '15 min'}` : ch.duration}
                     </div>
                   </div>
                 </div>

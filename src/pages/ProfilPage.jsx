@@ -21,6 +21,7 @@ export const ProfilPage = ({ onNavigate }) => {
   const [targetInstansi, setTargetInstansi] = useState(user?.targetInstansi || 'Kemenkumham RI');
   const [targetScore, setTargetScore] = useState(user?.targetScore || 450);
 
+  // [BACKEND-DYNAMIC]: Simpan pembaruan instansi impian & target skor ke tabel public.profiles (target_instansi, target_score)
   const handleSaveProfile = async () => {
     await updateProfile({ targetInstansi, targetScore });
     toast.success('Profil dan target kelulusan berhasil diperbarui!');

@@ -5,12 +5,14 @@ import { Input } from '../../components/ui/Input';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Avatar } from '../../components/ui/Avatar';
-import { Search, UserCheck, Shield, RefreshCw, Star, ShieldAlert } from 'lucide-react';
+import { Search, Shield, RefreshCw, Star } from 'lucide-react';
 import { useToast } from '../../components/ui/Toast';
+import { useAuth } from '../../context/AuthContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 
 export const AdminPenggunaPage = ({ onNavigate }) => {
   const toast = useToast();
+  const { user: currentUser } = useAuth();
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState(null);
@@ -61,6 +63,12 @@ export const AdminPenggunaPage = ({ onNavigate }) => {
   }, []);
 
   const handleToggleRole = async (targetUser) => {
+    // Cegah admin mencabut hak akses administrator dirinya sendiri (mencegah lockout)
+    if (currentUser?.id && targetUser.id === currentUser.id && targetUser.role === 'admin') {
+      toast.error('Anda tidak dapat mencabut peran Administrator akun Anda sendiri demi keamanan sistem.');
+      return;
+    }
+
     const newRole = targetUser.role === 'admin' ? 'student' : 'admin';
     setUpdatingId(targetUser.id);
     try {
@@ -124,7 +132,7 @@ export const AdminPenggunaPage = ({ onNavigate }) => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-ink">Data Pengguna & Hak Akses</h1>
+            <h1 className="text-2xl md:text-3xl font-extrabold text-ink">Data Pengguna &amp; Hak Akses</h1>
             <p className="text-sm font-medium text-gray-600">
               Kelola data seluruh siswa terdaftar, perbarui role Administrator, dan aktivasi paket Pro.
             </p>
@@ -160,59 +168,69 @@ export const AdminPenggunaPage = ({ onNavigate }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 font-medium">
-                {filtered.map((u, idx) => (
-                  <tr key={u.id} className="hover:bg-gray-50">
-                    <td className="p-4 text-center font-bold text-gray-400">{idx + 1}</td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Avatar name={u.name} size="sm" />
-                        <div>
-                          <div className="font-bold text-ink">{u.name}</div>
-                          <div className="text-xs text-gray-500">{u.email}</div>
+                {filtered.map((u, idx) => {
+                  const isCurrent = currentUser?.id === u.id;
+                  return (
+                    <tr key={u.id} className="hover:bg-gray-50">
+                      <td className="p-4 text-center font-bold text-gray-400">{idx + 1}</td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Avatar name={u.name} size="sm" />
+                          <div>
+                            <div className="font-bold text-ink flex items-center gap-1.5">
+                              {u.name}
+                              {isCurrent && (
+                                <span className="text-[10px] font-black uppercase px-1.5 py-0.5 bg-blue-100 text-primary border border-primary/30 rounded">
+                                  Anda
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-xs text-gray-500">{u.email}</div>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="p-4 text-center">
-                      {u.role === 'admin' ? (
-                        <Badge variant="accent">🛡️ ADMIN</Badge>
-                      ) : (
-                        <Badge variant="surface">SISWA</Badge>
-                      )}
-                    </td>
-                    <td className="p-4 font-bold text-ink">{u.instansi}</td>
-                    <td className="p-4 text-center">
-                      <Badge variant={u.isPro ? 'accent' : 'surface'}>
-                        {u.isPro ? 'GARUDA PRO' : 'GRATIS'}
-                      </Badge>
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          disabled={updatingId === u.id}
-                          onClick={() => handleTogglePro(u)}
-                          className="text-xs py-1 px-2.5"
-                          title="Ubah status Pro"
-                        >
-                          <Star size={13} className={u.isPro ? 'text-amber-500 fill-amber-500' : ''} />
-                          {u.isPro ? 'Cabut Pro' : 'Beri Pro'}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant={u.role === 'admin' ? 'secondary' : 'primary'}
-                          disabled={updatingId === u.id}
-                          onClick={() => handleToggleRole(u)}
-                          className="text-xs py-1 px-2.5"
-                          title="Ubah peran admin/siswa"
-                        >
-                          <Shield size={13} />
-                          {u.role === 'admin' ? 'Jadikan Siswa' : 'Jadikan Admin'}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="p-4 text-center">
+                        {u.role === 'admin' ? (
+                          <Badge variant="accent">🛡️ ADMIN</Badge>
+                        ) : (
+                          <Badge variant="surface">SISWA</Badge>
+                        )}
+                      </td>
+                      <td className="p-4 font-bold text-ink">{u.instansi}</td>
+                      <td className="p-4 text-center">
+                        <Badge variant={u.isPro ? 'accent' : 'surface'}>
+                          {u.isPro ? 'GARUDA PRO' : 'GRATIS'}
+                        </Badge>
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            disabled={updatingId === u.id}
+                            onClick={() => handleTogglePro(u)}
+                            className="text-xs py-1 px-2.5"
+                            title="Ubah status Pro"
+                          >
+                            <Star size={13} className={u.isPro ? 'text-amber-500 fill-amber-500' : ''} />
+                            {u.isPro ? 'Cabut Pro' : 'Beri Pro'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={u.role === 'admin' ? 'secondary' : 'primary'}
+                            disabled={updatingId === u.id || (isCurrent && u.role === 'admin')}
+                            onClick={() => handleToggleRole(u)}
+                            className="text-xs py-1 px-2.5"
+                            title={isCurrent && u.role === 'admin' ? 'Tidak dapat mengubah role sendiri' : 'Ubah peran admin/siswa'}
+                          >
+                            <Shield size={13} />
+                            {u.role === 'admin' ? 'Jadikan Siswa' : 'Jadikan Admin'}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
