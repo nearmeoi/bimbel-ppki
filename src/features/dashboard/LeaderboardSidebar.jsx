@@ -50,7 +50,7 @@ export const LeaderboardSidebar = ({
   const navigate = useNavigate();
 
   return (
-    <div className="w-full lg:w-[380px] xl:w-[420px] flex flex-col gap-6 lg:pt-0">
+    <div className="w-full lg:w-[380px] xl:w-[420px] flex-shrink-0 flex flex-col gap-6 lg:pt-0">
       {/* Target Harian Widget */}
       <TargetHarianWidget
         completed={targetHarian.completed}

@@ -217,7 +217,7 @@ export const DashboardPage = ({ onNavigate }) => {
       {/* ============================================================== */}
       {viewState === 'loading' && (
         <div className="flex flex-col lg:flex-row gap-8 animate-pulse">
-          <div className="flex-1 flex flex-col gap-6">
+          <div className="flex-1 min-w-0 flex flex-col gap-6">
             {/* Header skeleton */}
             <div className="flex flex-col gap-4">
               <Skeleton className="h-10 w-2/3 rounded-xl" />
@@ -259,7 +259,7 @@ export const DashboardPage = ({ onNavigate }) => {
       {/* ============================================================== */}
       {viewState === 'empty' && (
         <div className="flex flex-col lg:flex-row gap-8">
-          <div className="flex-1 flex flex-col gap-6">
+          <div className="flex-1 min-w-0 flex flex-col gap-6">
             {/* Greeting with 0 stats */}
             <DashboardHeader
               userName={activeUser.name || 'User'}
@@ -376,7 +376,7 @@ export const DashboardPage = ({ onNavigate }) => {
       {viewState === 'active' && (
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Column (Main Content) */}
-          <div className="flex-1 flex flex-col gap-6">
+          <div className="flex-1 min-w-0 flex flex-col gap-6">
             {/* Header row: Welcome + Continue action + Live/Realistic Stats */}
             <DashboardHeader
               userName={activeUser.name || 'User'}
